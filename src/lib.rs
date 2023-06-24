@@ -22,13 +22,13 @@ pub trait OptionObj: private::Optional
 {
     fn kind(&self) -> OptionKind
     {
-        if self.is_none()
+        if self.is_some()
         {
-            OptionKind::None
+            OptionKind::Some
         }
         else
         {
-            OptionKind::Some
+            OptionKind::None
         }
     }
     fn is_some(&self) -> bool;
@@ -42,7 +42,7 @@ impl<Some> const OptionObj for Option<Some>
     }
     fn is_none(&self) -> bool
     {
-        Option::is_none(&self)
+        !self.is_some()
     }
 }
 
