@@ -72,7 +72,11 @@ impl<Some> const Optional for Option<Some>
 }
 
 pub trait Some<const OPTION: OptionKind>: Optional {}
-
 impl<O> Some<{OptionKind::Some}> for O
+where
+    O: Optional {}
+
+pub trait None<const OPTION: OptionKind>: Optional {}
+impl<O> None<{OptionKind::None}> for O
 where
     O: Optional {}
