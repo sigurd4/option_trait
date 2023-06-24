@@ -34,6 +34,13 @@ pub trait OptionObj: private::Optional
     fn is_some(&self) -> bool;
     fn is_none(&self) -> bool;
 }
+impl<Some> const From<&Option<Some>> for OptionKind
+{
+    fn from(option: &Option<Some>) -> Self
+    {
+        option.kind()
+    }
+}
 impl<Some> const OptionObj for Option<Some>
 {
     fn is_some(&self) -> bool
