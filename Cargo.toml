@@ -1,0 +1,11 @@
+[package]
+name = "option_trait"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Helper traits for more generalized options"
+repository = "https://github.com/sigurd4/option_trait"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
