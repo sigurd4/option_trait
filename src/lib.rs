@@ -11,8 +11,14 @@ pub enum OptionKind
     Some = 1
 }
 
+mod private
+{
+    pub trait Optional {}
+    impl<T> Optional for Option<T> {}
+}
+
 #[const_trait]
-pub trait OptionObj
+pub trait OptionObj: private::Optional
 {
     fn kind(&self) -> OptionKind
     {
