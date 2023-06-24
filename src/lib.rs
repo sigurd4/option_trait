@@ -63,11 +63,11 @@ impl<Some> const Optional for Option<Some>
     }
     fn some(some: <Option<Some> as Optional>::Some) -> Self
     {
-        Self::Some(some)
+        Some(some)
     }
     fn none() -> Self
     {
-        Self::None
+        None
     }
 }
 
