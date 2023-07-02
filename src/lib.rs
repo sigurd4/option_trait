@@ -15,6 +15,16 @@ mod private
 {
     pub trait Optional {}
     impl<T> Optional for Option<T> {}
+
+    pub trait Maybe<T> {}
+    impl<T> Maybe<T> for Option<T> {}
+    impl<T> Maybe<T> for T {}
+}
+
+#[const_trait]
+pub trait Maybe<T>
+{
+    fn into_option(self) -> Option<T>;
 }
 
 #[const_trait]
@@ -54,20 +64,29 @@ impl<Some> const OptionObj for Option<Some>
 }
 
 #[const_trait]
-pub trait Optional: OptionObj
+pub trait Optional: OptionObj + Maybe<Self::Some>
 {
     type Some;
-    fn into_option(self) -> Option<Self::Some>;
     fn some(some: Self::Some) -> Self;
     fn none() -> Self;
 }
-impl<Some> const Optional for Option<Some>
+impl<Some> const Maybe<Some> for Some
 {
-    type Some = Some;
+    fn into_option(self) -> Option<Some>
+    {
+        Some(self)
+    }
+}
+impl<Some> const Maybe<Some> for Option<Some>
+{
     fn into_option(self) -> Option<Some>
     {
         self
     }
+}
+impl<Some> const Optional for Option<Some>
+{
+    type Some = Some;
     fn some(some: <Option<Some> as Optional>::Some) -> Self
     {
         Some(some)
