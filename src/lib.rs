@@ -2,6 +2,8 @@
 
 #![feature(adt_const_params)]
 #![feature(const_trait_impl)]
+#![feature(auto_traits)]
+#![feature(negative_impls)]
 
 #[repr(u8)]
 #[derive(Debug, PartialEq, Eq)]
@@ -16,15 +18,44 @@ mod private
     pub trait Optional {}
     impl<T> Optional for Option<T> {}
 
+    pub auto trait NotVoid {}
+    impl !NotVoid for () {}
+
     pub trait Maybe<T> {}
     impl<T> Maybe<T> for Option<T> {}
     impl<T> Maybe<T> for T {}
+    impl<T> Maybe<T> for ()
+    where
+        T: NotVoid {}
 }
 
 #[const_trait]
-pub trait Maybe<T>
+pub trait Maybe<T>: private::Maybe<T>
 {
     fn into_option(self) -> Option<T>;
+}
+impl<Some> const Maybe<Some> for Some
+{
+    fn into_option(self) -> Option<Some>
+    {
+        Some(self)
+    }
+}
+impl<Some> const Maybe<Some> for ()
+where
+    Some: private::NotVoid
+{
+    fn into_option(self) -> Option<Some>
+    {
+        None
+    }
+}
+impl<Some> const Maybe<Some> for Option<Some>
+{
+    fn into_option(self) -> Option<Some>
+    {
+        self
+    }
 }
 
 #[const_trait]
@@ -69,20 +100,6 @@ pub trait Optional: OptionObj + Maybe<Self::Some>
     type Some;
     fn some(some: Self::Some) -> Self;
     fn none() -> Self;
-}
-impl<Some> const Maybe<Some> for Some
-{
-    fn into_option(self) -> Option<Some>
-    {
-        Some(self)
-    }
-}
-impl<Some> const Maybe<Some> for Option<Some>
-{
-    fn into_option(self) -> Option<Some>
-    {
-        self
-    }
 }
 impl<Some> const Optional for Option<Some>
 {
