@@ -52,6 +52,19 @@ where
         Self(unsafe {MaybeUninit::array_assume_init(x)})
     }
 
+    pub fn map<F, O>(self, map: F) -> MaybeCell<O, IS_SOME>
+    where
+        F: FnOnce(T) -> O
+    {
+        let mut x = MaybeUninit::uninit_array();
+        if IS_SOME
+        {
+            unsafe {x.as_mut_ptr().write(MaybeUninit::new(map(self.0.as_ptr().read())))};
+        }
+        core::mem::forget(self);
+        MaybeCell(unsafe {MaybeUninit::array_assume_init(x)})
+    }
+
     pub const fn into_option(self) -> Option<T>
     {
         if IS_SOME
