@@ -18,7 +18,8 @@ moddef::moddef!(
         option_obj,
         optional,
         maybe,
-        maybe_cell
+        maybe_cell,
+        static_maybe
     }
 );
 
@@ -32,12 +33,16 @@ mod private
     pub auto trait NotVoid {}
     impl !NotVoid for () {}
 
-    pub trait Maybe<T> {}
+    pub trait Maybe<T>
+    where
+        T: ?Sized {}
     impl<T> Maybe<T> for Option<T> {}
-    impl<T> Maybe<T> for T {}
+    impl<T> Maybe<T> for T
+    where
+        T: ?Sized {}
     impl<T> Maybe<T> for ()
     where
-        T: NotVoid {}
+        T: NotVoid + ?Sized {}
     impl<T, const IS_SOME: bool> Maybe<T> for MaybeCell<T, IS_SOME>
     where
         [(); IS_SOME as usize]:
