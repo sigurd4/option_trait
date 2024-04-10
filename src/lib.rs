@@ -8,6 +8,7 @@
 #![feature(maybe_uninit_uninit_array)]
 #![feature(maybe_uninit_array_assume_init)]
 #![feature(const_ptr_write)]
+#![feature(try_trait_v2_yeet)]
 
 #![feature(generic_const_exprs)]
 #![feature(adt_const_params)]
