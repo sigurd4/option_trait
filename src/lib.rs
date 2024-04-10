@@ -32,13 +32,10 @@ moddef::moddef!(
 
 mod private
 {
-    use crate::MaybeCell;
+    use crate::{MaybeCell, NotVoid};
 
     pub trait Optional {}
     impl<T> Optional for Option<T> {}
-
-    pub auto trait NotVoid {}
-    impl !NotVoid for () {}
 
     pub trait Maybe<T>
     where

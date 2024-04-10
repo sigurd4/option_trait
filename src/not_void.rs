@@ -1,13 +1,11 @@
 use crate::private;
 
-pub trait NotVoid: private::NotVoid
+pub auto trait NotVoid
 {
 
 }
 
-impl<T> NotVoid for T
-where
-    T: private::NotVoid + ?Sized
+impl !NotVoid for ()
 {
 
 }
