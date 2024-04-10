@@ -19,6 +19,12 @@ moddef::moddef!(
         optional,
         maybe,
         maybe_cell,
+        maybe_and,
+        maybe_or,
+        maybe_nand,
+        maybe_nor,
+        maybe_xor,
+        maybe_xnor,
         static_maybe
     }
 );
