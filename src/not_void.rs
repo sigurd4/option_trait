@@ -1,11 +1,2 @@
-use crate::private;
-
-pub auto trait NotVoid
-{
-
-}
-
-impl !NotVoid for ()
-{
-
-}
+pub auto trait NotVoid {}
+impl !NotVoid for () {}
