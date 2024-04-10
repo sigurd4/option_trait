@@ -2,7 +2,7 @@ use crate::{private::NotVoid, StaticMaybe};
 
 pub trait MaybeXor<T, Rhs>: StaticMaybe<T>
 where
-Rhs: StaticMaybe<T>
+    Rhs: StaticMaybe<T>
 {
     type Output: StaticMaybe<T>;
 }
