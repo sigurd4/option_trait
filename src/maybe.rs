@@ -1,4 +1,4 @@
-use crate::private;
+use crate::{private, NotVoid};
 
 pub trait Maybe<T>: private::Maybe<T>
 where
@@ -31,7 +31,7 @@ where
 }
 impl<Some> const Maybe<Some> for ()
 where
-    Some: private::NotVoid + ?Sized
+    Some: NotVoid + ?Sized
 {
     fn into_option(self) -> Option<Some>
     where

@@ -1,4 +1,4 @@
-use crate::{private::NotVoid, StaticMaybe};
+use crate::{NotVoid, StaticMaybe};
 
 pub trait MaybeXnor<T, Rhs>: StaticMaybe<T>
 where

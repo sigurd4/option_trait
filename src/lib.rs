@@ -25,6 +25,7 @@ moddef::moddef!(
         maybe_nor,
         maybe_xor,
         maybe_xnor,
+        not_void,
         static_maybe
     }
 );
