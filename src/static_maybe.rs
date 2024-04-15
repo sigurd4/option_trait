@@ -12,6 +12,10 @@ where
     type Maybe<M>: StaticMaybe<M> + ?Sized
     where
         M: StaticMaybe<M> + ?Sized;
+    type MaybeOr<M, O>: ?Sized
+    where
+        M: ?Sized,
+        O: ?Sized;
 
     fn maybe_from_fn<F>(func: F) -> Self
     where
@@ -30,6 +34,10 @@ where
     type Maybe<M> = M::Some
     where
         M: StaticMaybe<M> + ?Sized;
+    type MaybeOr<M, O> = M
+    where
+        M: ?Sized,
+        O: ?Sized;
     
     fn maybe_from_fn<F>(func: F) -> Self
     where
@@ -51,6 +59,10 @@ where
     type Maybe<M> = M::None
     where
         M: StaticMaybe<M> + ?Sized;
+    type MaybeOr<M, O> = O
+    where
+        M: ?Sized,
+        O: ?Sized;
 
     fn maybe_from_fn<F>(_func: F) -> Self
     where
@@ -70,6 +82,10 @@ impl const StaticMaybe<()> for ()
     type Maybe<M> = M::None
     where
         M: StaticMaybe<M> + ?Sized;
+    type MaybeOr<M, O> = O
+    where
+        M: ?Sized,
+        O: ?Sized;
 
     fn maybe_from_fn<F>(_func: F) -> Self
     where
@@ -91,6 +107,10 @@ where
     type Maybe<M> = M::Some
     where
         M: StaticMaybe<M> + ?Sized;
+    type MaybeOr<M, O> = M
+    where
+        M: ?Sized,
+        O: ?Sized;
 
     fn maybe_from_fn<F>(func: F) -> Self
     where
@@ -112,6 +132,10 @@ where
     type Maybe<M> = M::None
     where
         M: StaticMaybe<M> + ?Sized;
+    type MaybeOr<M, O> = O
+    where
+        M: ?Sized,
+        O: ?Sized;
 
     fn maybe_from_fn<F>(func: F) -> Self
     where
