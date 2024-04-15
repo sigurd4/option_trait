@@ -4,6 +4,8 @@ pub trait StaticMaybe<T>: Maybe<T>
 where
     T: ?Sized
 {
+    const IS_SOME: bool;
+    const IS_NONE: bool;
     type Some: StaticMaybe<T> + ?Sized;
     type None: StaticMaybe<T>;
     type Opposite: StaticMaybe<T> + ?Sized;
@@ -20,6 +22,8 @@ impl<Some> const StaticMaybe<Some> for Some
 where
     Some: NotVoid + ?Sized
 {
+    const IS_SOME: bool = true;
+    const IS_NONE: bool = false;
     type None = ();
     type Some = Some;
     type Opposite = ();
@@ -39,6 +43,8 @@ impl<Some> const StaticMaybe<Some> for ()
 where
     Some: NotVoid + ?Sized
 {
+    const IS_SOME: bool = false;
+    const IS_NONE: bool = true;
     type None = ();
     type Some = Some;
     type Opposite = Some;
@@ -51,16 +57,37 @@ where
         F: FnOnce() -> Some,
         Some: Sized
     {
-        ()
+        
+    }
+}
+impl const StaticMaybe<()> for ()
+{
+    const IS_SOME: bool = false;
+    const IS_NONE: bool = true;
+    type None = ();
+    type Some = ();
+    type Opposite = ();
+    type Maybe<M> = M::None
+    where
+        M: StaticMaybe<M> + ?Sized;
+
+    fn maybe_from_fn<F>(_func: F) -> Self
+    where
+        F: FnOnce() -> (),
+        (): Sized
+    {
+        
     }
 }
 impl<Some> const StaticMaybe<Some> for MaybeCell<Some, true>
 where
-    Some: NotVoid,
+    Some: StaticMaybe<Some>
 {
-    type None = ();
-    type Some = Some;
-    type Opposite = ();
+    const IS_SOME: bool = true;
+    const IS_NONE: bool = false;
+    type None = Some::None;
+    type Some = Some::Some;
+    type Opposite = Some::None;
     type Maybe<M> = M::Some
     where
         M: StaticMaybe<M> + ?Sized;
@@ -75,11 +102,13 @@ where
 }
 impl<Some> const StaticMaybe<Some> for MaybeCell<Some, false>
 where
-    Some: NotVoid,
+    Some: StaticMaybe<Some>
 {
-    type None = ();
-    type Some = Some;
-    type Opposite = Some;
+    const IS_SOME: bool = false;
+    const IS_NONE: bool = true;
+    type None = Some::None;
+    type Some = Some::Some;
+    type Opposite = Some::Some;
     type Maybe<M> = M::None
     where
         M: StaticMaybe<M> + ?Sized;
