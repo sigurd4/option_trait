@@ -21,6 +21,13 @@ where
     where
         F: FnOnce() -> T,
         T: Sized;
+
+    fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
+    where
+        F: FnOnce<(T,)>,
+        F::Output: StaticMaybe<F::Output>,
+        T: Sized,
+        Self::Maybe<F::Output>: Sized;
 }
 impl<Some> const StaticMaybe<Some> for Some
 where
@@ -45,6 +52,16 @@ where
         Some: Sized
     {
         func()
+    }
+
+    fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
+    where
+        F: FnOnce<(Some,)>,
+        F::Output: StaticMaybe<F::Output>,
+        Some: Sized,
+        Self::Maybe<F::Output>: Sized
+    {
+        StaticMaybe::maybe_from_fn(|| map(self))
     }
 }
 impl<Some> const StaticMaybe<Some> for ()
@@ -71,6 +88,16 @@ where
     {
         
     }
+
+    fn maybe_map<F>(self, _: F) -> Self::Maybe<F::Output>
+    where
+        F: FnOnce<(Some,)>,
+        F::Output: StaticMaybe<F::Output>,
+        Some: Sized,
+        Self::Maybe<F::Output>: Sized
+    {
+        StaticMaybe::maybe_from_fn(|| panic!())
+    }
 }
 impl const StaticMaybe<()> for ()
 {
@@ -93,6 +120,16 @@ impl const StaticMaybe<()> for ()
         (): Sized
     {
         
+    }
+
+    fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
+    where
+        F: FnOnce<((),)>,
+        F::Output: StaticMaybe<F::Output>,
+        (): Sized,
+        Self::Maybe<F::Output>: Sized
+    {
+        StaticMaybe::maybe_from_fn(|| map(self))
     }
 }
 impl<Some> const StaticMaybe<Some> for MaybeCell<Some, true>
@@ -119,6 +156,16 @@ where
     {
         Self::from_fn(func)
     }
+
+    fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
+    where
+        F: FnOnce<(Some,)>,
+        F::Output: StaticMaybe<F::Output>,
+        Some: Sized,
+        Self::Maybe<F::Output>: Sized
+    {
+        StaticMaybe::maybe_from_fn(|| map(self.into_value()))
+    }
 }
 impl<Some> const StaticMaybe<Some> for MaybeCell<Some, false>
 where
@@ -143,5 +190,15 @@ where
         Some: Sized
     {
         Self::from_fn(func)
+    }
+
+    fn maybe_map<F>(self, _: F) -> Self::Maybe<F::Output>
+    where
+        F: FnOnce<(Some,)>,
+        F::Output: StaticMaybe<F::Output>,
+        Some: Sized,
+        Self::Maybe<F::Output>: Sized
+    {
+        StaticMaybe::maybe_from_fn(|| panic!())
     }
 }

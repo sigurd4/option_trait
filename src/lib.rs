@@ -9,6 +9,7 @@
 #![feature(maybe_uninit_array_assume_init)]
 #![feature(const_ptr_write)]
 #![feature(try_trait_v2_yeet)]
+#![feature(unboxed_closures)]
 
 #![feature(generic_const_exprs)]
 #![feature(adt_const_params)]
