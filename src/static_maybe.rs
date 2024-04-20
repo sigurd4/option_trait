@@ -21,6 +21,11 @@ where
     where
         F: FnOnce() -> T,
         T: Sized;
+        
+    fn maybe_or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
+    where
+        M: FnOnce<()>,
+        O: FnOnce<()>;
 
     fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
     where
@@ -52,6 +57,14 @@ where
         Some: Sized
     {
         func()
+    }
+    
+    fn maybe_or_from_fn<M, O>(maybe: M, _or: O) -> Self::MaybeOr<M::Output, O::Output>
+    where
+        M: FnOnce<()>,
+        O: FnOnce<()>
+    {
+        maybe()
     }
 
     fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
@@ -89,6 +102,14 @@ where
         
     }
 
+    fn maybe_or_from_fn<M, O>(_maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
+    where
+        M: FnOnce<()>,
+        O: FnOnce<()>
+    {
+        or()
+    }
+
     fn maybe_map<F>(self, _: F) -> Self::Maybe<F::Output>
     where
         F: FnOnce<(Some,)>,
@@ -120,6 +141,14 @@ impl const StaticMaybe<()> for ()
         (): Sized
     {
         
+    }
+    
+    fn maybe_or_from_fn<M, O>(_maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
+    where
+        M: FnOnce<()>,
+        O: FnOnce<()>
+    {
+        or()
     }
 
     fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
@@ -156,6 +185,14 @@ where
     {
         Self::from_fn(func)
     }
+    
+    fn maybe_or_from_fn<M, O>(maybe: M, _or: O) -> Self::MaybeOr<M::Output, O::Output>
+    where
+        M: FnOnce<()>,
+        O: FnOnce<()>
+    {
+        maybe()
+    }
 
     fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
     where
@@ -190,6 +227,14 @@ where
         Some: Sized
     {
         Self::from_fn(func)
+    }
+    
+    fn maybe_or_from_fn<M, O>(_maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
+    where
+        M: FnOnce<()>,
+        O: FnOnce<()>
+    {
+        or()
     }
 
     fn maybe_map<F>(self, _: F) -> Self::Maybe<F::Output>
