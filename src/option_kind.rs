@@ -9,7 +9,7 @@ pub enum OptionKind
     Some = 1
 }
 
-impl<Some> const From<&Option<Some>> for OptionKind
+impl<Some> /*const*/ From<&Option<Some>> for OptionKind
 {
     fn from(option: &Option<Some>) -> Self
     {

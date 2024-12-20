@@ -1,6 +1,7 @@
-use crate::{Maybe, OptionObj};
+use crate::{OptionObj, PureMaybe};
 
-pub trait Optional: OptionObj + Maybe<Self::Some>
+#[const_trait]
+pub trait Optional: OptionObj + PureMaybe<Self::Some>
 {
     type Some;
     fn some(some: Self::Some) -> Self;
