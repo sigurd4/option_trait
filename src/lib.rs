@@ -179,23 +179,20 @@ mod test
     use crate::option_trait;
 
     #[test]
-    fn it_works()
-    {
-
-    }
+    fn it_works() {}
 
     #[test]
     fn pinned()
     {
         use option_trait::*;
-        
+
         let maybe = core::pin::pin!(MaybeCell::some(777));
-        
+
         assert!(maybe.is_some());
         assert_eq!(maybe.as_value(), &777);
-        
+
         let option = maybe.get_pin_mut();
-        
+
         assert!(option.is_some());
         assert_eq!(*option.unwrap(), 777);
     }
