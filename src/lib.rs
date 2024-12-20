@@ -13,6 +13,7 @@
 #![feature(associated_const_equality)]
 #![feature(structural_match)]
 #![feature(core_intrinsics)]
+#![feature(const_eval_select)]
 #![feature(specialization)]
 #![feature(generic_const_exprs)]
 
@@ -32,6 +33,8 @@ moddef::moddef!(
         static_maybe
     }
 );
+
+use crate as option_trait;
 
 const unsafe fn transmute_same_size<T, U>(value: T) -> U
 {
@@ -67,6 +70,11 @@ const fn assume_same_ref<T, U>(value: &T) -> &U
 {
     assert!(is_same_type::<T, U>());
     unsafe { core::intrinsics::transmute::<&T, &U>(value) }
+}
+const fn assume_same_mut<T, U>(value: &mut T) -> &mut U
+{
+    assert!(is_same_type::<T, U>());
+    unsafe { core::intrinsics::transmute::<&mut T, &mut U>(value) }
 }
 const fn copy_ref<T>(src: &T) -> Copied<T>
 where
@@ -153,7 +161,7 @@ mod private
     impl<T> Maybe<T> for () where T: NotVoid + ?Sized {}
     impl<T> Maybe<T> for [T; 0] {}
     impl<T> Maybe<T> for [T; 1] {}
-    impl<T, const IS_SOME: bool> Maybe<T> for MaybeCell<T, IS_SOME> where [(); IS_SOME as usize]: {}
+    impl<T, const IS_SOME: bool> Maybe<T> for MaybeCell<T, IS_SOME> {}
 
     pub trait PureMaybe<T>: Maybe<T>
     where
@@ -163,4 +171,32 @@ mod private
     impl<T> PureMaybe<T> for Option<T> {}
     impl<T> PureMaybe<T> for T where T: ?Sized {}
     impl<T> PureMaybe<T> for () where T: NotVoid + ?Sized {}
+}
+
+#[cfg(test)]
+mod test
+{
+    use crate::option_trait;
+
+    #[test]
+    fn it_works()
+    {
+
+    }
+
+    #[test]
+    fn pinned()
+    {
+        use option_trait::*;
+        
+        let maybe = core::pin::pin!(MaybeCell::some(777));
+        
+        assert!(maybe.is_some());
+        assert_eq!(maybe.as_value(), &777);
+        
+        let option = maybe.get_pin_mut();
+        
+        assert!(option.is_some());
+        assert_eq!(*option.unwrap(), 777);
+    }
 }
