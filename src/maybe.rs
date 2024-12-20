@@ -136,17 +136,16 @@ where
     {
         MaybeAnd::and(self.pure_maybe(), other.pure_maybe())
     }
-    fn and_then<F, U, Rhs>(self, and_then: F) -> <Self::Pure as MaybeAndThen<T, U, Rhs::Pure>>::Output
+    fn and_then<U, F>(self, and_then: F) -> <Self::Pure as MaybeAndThen<T, U, <<F as FnOnce<(T,)>>::Output as Maybe<U>>::Pure>>::Output
     where
-        F: FnOnce(T) -> Rhs,
-        Rhs: Maybe<U>,
+        F: FnOnce<(T,), Output: Maybe<U>>,
         Self: Sized,
-        Rhs::Pure: Sized,
-        Self::Pure: MaybeAndThen<T, U, Rhs::Pure> + Sized,
+        <<F as FnOnce<(T,)>>::Output as Maybe<U>>::Pure: Sized,
+        Self::Pure: MaybeAndThen<T, U, <<F as FnOnce<(T,)>>::Output as Maybe<U>>::Pure> + Sized,
         T: StaticMaybe<T> + Sized,
         U: StaticMaybe<U> + Sized,
         (): StaticMaybe<T> + StaticMaybe<U>,
-        <Self::Pure as MaybeAndThen<T, U, Rhs::Pure>>::Output: Sized
+        <Self::Pure as MaybeAndThen<T, U, <<F as FnOnce<(T,)>>::Output as Maybe<U>>::Pure>>::Output: Sized
     {
         MaybeAndThen::and_then(self.pure_maybe(), |x| and_then(x).pure_maybe())
     }
@@ -172,16 +171,14 @@ where
     {
         MaybeOr::or(self.pure_maybe(), other.pure_maybe())
     }
-    fn or_else<Rhs, F>(self, or_else: F) -> <Self::Pure as MaybeOr<T, Rhs::Pure>>::Output
+    fn or_else<F>(self, or_else: F) -> <Self::Pure as MaybeOr<T, <<F as FnOnce<()>>::Output as Maybe<T>>::Pure>>::Output
     where
-        F: FnOnce() -> Rhs,
-        Rhs: Maybe<T>,
+        F: FnOnce<(), Output: Maybe<T, Pure: Sized>>,
         Self: Sized,
-        Rhs::Pure: Sized,
-        Self::Pure: MaybeOr<T, Rhs::Pure> + Sized,
+        Self::Pure: MaybeOr<T, <<F as FnOnce<()>>::Output as Maybe<T>>::Pure> + Sized,
         T: StaticMaybe<T> + Sized,
         (): StaticMaybe<T>,
-        <Self::Pure as MaybeOr<T, Rhs::Pure>>::Output: Sized
+        <Self::Pure as MaybeOr<T, <<F as FnOnce<()>>::Output as Maybe<T>>::Pure>>::Output: Sized
     {
         MaybeOr::or_else(self.pure_maybe(), || or_else().pure_maybe())
     }

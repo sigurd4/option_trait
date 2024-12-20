@@ -185,7 +185,7 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     /// let maybe = MaybeCell::some(777);
     /// 
     /// assert!(maybe.is_some());
-    /// assert_eq!(maybe.as_value(), &777);
+    /// assert_eq!(maybe.unwrap_ref(), &777);
     /// 
     /// let option = maybe.option();
     /// 
@@ -215,7 +215,7 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     /// let maybe = MaybeCell::some(777);
     /// 
     /// assert!(maybe.is_some());
-    /// assert_eq!(maybe.as_value(), &777);
+    /// assert_eq!(maybe.unwrap_ref(), &777);
     /// 
     /// let option = maybe.get();
     /// 
@@ -244,7 +244,7 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     /// let mut maybe = MaybeCell::some(777);
     /// 
     /// assert!(maybe.is_some());
-    /// assert_eq!(maybe.as_value(), &777);
+    /// assert_eq!(maybe.unwrap_ref(), &777);
     /// 
     /// let option = maybe.get_mut();
     /// 
@@ -262,7 +262,7 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
             None
         }
     }
-    /// Retrieves a pinned value in the form of an [Option](core::option::Option).
+    /// Retrieves the pinned internal value in the form of an [Option](core::option::Option).
     /// 
     /// # Examples
     /// 
@@ -273,7 +273,7 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     /// let maybe = maybe.as_ref();
     /// 
     /// assert!(maybe.is_some());
-    /// assert_eq!(maybe.as_value(), &777);
+    /// assert_eq!(maybe.unwrap_ref(), &777);
     /// 
     /// let option = maybe.get_pin();
     /// 
@@ -293,7 +293,7 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
             None
         }
     }
-    /// Mutably retrieves a pinned value in the form of an [Option](core::option::Option).
+    /// Mutably retrieves the pinned internal value in the form of an [Option](core::option::Option).
     /// 
     /// # Examples
     /// 
@@ -303,7 +303,7 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     /// let maybe = core::pin::pin!(MaybeCell::some(777));
     /// 
     /// assert!(maybe.is_some());
-    /// assert_eq!(maybe.as_value(), &777);
+    /// assert_eq!(maybe.unwrap_ref(), &777);
     /// 
     /// let option = maybe.get_pin_mut();
     /// 
@@ -362,7 +362,7 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     {
         !IS_SOME
     }
-    /// Retrieves the internal value value in the form of a [MaybeCell](MaybeCell).
+    /// Retrieves the internal value in the form of a [MaybeCell](MaybeCell).
     /// 
     /// # Examples
     /// 
@@ -372,12 +372,13 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     /// let maybe = MaybeCell::some(777);
     /// 
     /// assert!(maybe.is_some());
-    /// assert_eq!(maybe.as_value(), &777);
+    /// assert_eq!(maybe.unwrap_ref(), &777);
     /// 
-    /// let option = maybe.as_ref();
+    /// let maybe_ref = maybe.as_ref();
     /// 
-    /// assert!(option.is_some());
-    /// assert_eq!(option.unwrap(), &777);
+    /// assert!(maybe_ref.is_some());
+    /// assert_eq!(maybe_ref.unwrap(), &777);
+    /// ```
     pub const fn as_ref<'a>(&'a self) -> <Self as Maybe<T>>::AsRef<'a>
     where
         T: 'a
@@ -388,6 +389,23 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         MaybeCell::assume_some(self.unwrap_ref())
     }
+    /// Mutably retrieves the internal value in the form of a [MaybeCell](MaybeCell).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let mut maybe = MaybeCell::some(777);
+    /// 
+    /// assert!(maybe.is_some());
+    /// assert_eq!(maybe.unwrap_mut(), &mut 777);
+    /// 
+    /// let maybe_ref = maybe.as_mut();
+    /// 
+    /// assert!(maybe_ref.is_some());
+    /// assert_eq!(maybe_ref.unwrap(), &mut 777);
+    /// ```
     pub const fn as_mut<'a>(&'a mut self) -> <Self as Maybe<T>>::AsMut<'a>
     where
         T: 'a
@@ -398,6 +416,24 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         MaybeCell::assume_some(self.unwrap_mut())
     }
+    /// Retrieves the pinned internal value in the form of an [Option](core::option::Option).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    ///     
+    /// let maybe = core::pin::pin!(MaybeCell::some(777));
+    /// let maybe = maybe.as_ref();
+    /// 
+    /// assert!(maybe.is_some());
+    /// assert_eq!(maybe.unwrap_ref(), &777);
+    /// 
+    /// let maybe_ref = maybe.as_pin_ref();
+    /// 
+    /// assert!(maybe_ref.is_some());
+    /// assert_eq!(&*maybe_ref.unwrap(), &777);
+    /// ```
     pub fn as_pin_ref<'a>(self: Pin<&'a Self>) -> <Self as Maybe<T>>::AsPinRef<'a>
     where
         T: 'a
@@ -408,6 +444,23 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         MaybeCell::assume_some(self.unwrap_pin_ref())
     }
+    /// Retrieves the pinned internal value in the form of an [Option](core::option::Option).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    ///     
+    /// let mut maybe = core::pin::pin!(MaybeCell::some(777));
+    /// 
+    /// assert!(maybe.is_some());
+    /// assert_eq!(maybe.unwrap_mut(), &mut 777);
+    /// 
+    /// let maybe_ref = maybe.as_pin_mut();
+    /// 
+    /// assert!(maybe_ref.is_some());
+    /// assert_eq!(&mut *maybe_ref.unwrap(), &mut 777);
+    /// ```
     pub fn as_pin_mut<'a>(self: Pin<&'a mut Self>) -> <Self as Maybe<T>>::AsPinMut<'a>
     where
         T: 'a
@@ -418,6 +471,23 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         MaybeCell::assume_some(self.unwrap_pin_mut())
     }
+    /// Retrieves the pinned internal value in the form of a slice.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    ///     
+    /// let maybe = MaybeCell::some(777);
+    /// 
+    /// assert!(maybe.is_some());
+    /// assert_eq!(maybe.unwrap_ref(), &777);
+    /// 
+    /// let slice = maybe.as_slice();
+    /// 
+    /// assert_eq!(slice.len(), 1);
+    /// assert_eq!(slice, &[777]);
+    /// ```
     pub const fn as_slice(&self) -> &[T]
     where
         T: Sized
@@ -428,6 +498,23 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         core::slice::from_ref(self.unwrap_ref())
     }
+    /// Retrieves the pinned internal value in the form of a slice.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    ///     
+    /// let mut maybe = MaybeCell::some(777);
+    /// 
+    /// assert!(maybe.is_some());
+    /// assert_eq!(maybe.unwrap_mut(), &mut 777);
+    /// 
+    /// let slice = maybe.as_mut_slice();
+    /// 
+    /// assert_eq!(slice.len(), 1);
+    /// assert_eq!(slice, &mut [777]);
+    /// ```
     pub const fn as_mut_slice(&mut self) -> &mut [T]
     where
         T: Sized
@@ -438,20 +525,38 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         core::slice::from_mut(self.unwrap_mut())
     }
+    /// Unwraps the [MaybeCell](MaybeCell) and prints a user defined message upon failure.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = MaybeCell::some(777);
+    /// 
+    /// assert_eq!(maybe.expect("This should never happen..."), 777);
+    /// ```
     pub const fn expect(self, msg: &str) -> T
     where
         T: Sized
     {
         if !IS_SOME
         {
-            panic!("{}", msg)
+            Self::on_unwrap_empty_msg(msg)
         }
         self.unwrap()
     }
-    const fn on_unwrap_empty() -> !
-    {
-        panic!("called `MaybeCell::unwrap()` on a `None` value")
-    }
+    /// Unwraps the [MaybeCell](MaybeCell) and returns its internal value, if it exists. If not, it will result in an error.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = MaybeCell::some(777);
+    /// 
+    /// assert_eq!(maybe.unwrap(), 777);
+    /// ```
     pub const fn unwrap(self) -> T
     where
         T: Sized
@@ -466,6 +571,17 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         core::mem::forget(self);
         return x;
     }
+    /// Unwraps the [MaybeCell](MaybeCell) and returns its internal value by reference, if it exists. If not, it will result in an error.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = MaybeCell::some(777);
+    /// 
+    /// assert_eq!(maybe.unwrap_ref(), &777);
+    /// ```
     pub const fn unwrap_ref(&self) -> &T
     {
         if !IS_SOME
@@ -474,6 +590,17 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         crate::assume_same_ref(&self.0)
     }
+    /// Unwraps the [MaybeCell](MaybeCell) and returns its internal value by mutable reference, if it exists. If not, it will result in an error.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let mut maybe = MaybeCell::some(777);
+    /// 
+    /// assert_eq!(maybe.unwrap_mut(), &mut 777);
+    /// ```
     pub const fn unwrap_mut(&mut self) -> &mut T
     {
         if !IS_SOME
@@ -482,6 +609,18 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         crate::assume_same_mut(&mut self.0)
     }
+    /// Unwraps the [MaybeCell](MaybeCell) and returns its pinned internal value by reference, if it exists. If not, it will result in an error.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = core::pin::pin!(MaybeCell::some(777));
+    /// let maybe = maybe.as_ref();
+    /// 
+    /// assert_eq!(&*maybe.unwrap_pin_ref(), &777);
+    /// ```
     pub fn unwrap_pin_ref(self: Pin<&Self>) -> Pin<&T>
     {
         if !IS_SOME
@@ -492,6 +631,17 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
             self.map_unchecked(|this| this.unwrap_ref())
         }
     }
+    /// Unwraps the [MaybeCell](MaybeCell) and returns its pinned internal value by mutable reference, if it exists. If not, it will result in an error.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = core::pin::pin!(MaybeCell::some(777));
+    /// 
+    /// assert_eq!(&mut *maybe.unwrap_pin_mut(), &mut 777);
+    /// ```
     pub fn unwrap_pin_mut(self: Pin<&mut Self>) -> Pin<&mut T>
     {
         if !IS_SOME
@@ -502,6 +652,21 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
             self.map_unchecked_mut(|this| this.unwrap_mut())
         }
     }
+    /// Unwraps the [MaybeCell](MaybeCell) and returns its internal value, if it exists. Otherwise returns `default`
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = MaybeCell::some(777);
+    /// 
+    /// assert_eq!(maybe.unwrap_or(666), 777);
+    /// 
+    /// let empty = MaybeCell::none_like(&maybe);
+    /// 
+    /// assert_eq!(empty.unwrap_or(666), 666);
+    /// ```
     pub fn unwrap_or(self, default: T) -> T
     where
         T: Sized
@@ -512,6 +677,21 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         self.unwrap()
     }
+    /// Unwraps the [MaybeCell](MaybeCell) and returns its internal value, if it exists. Otherwise returns the result of `default`.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = MaybeCell::some(777);
+    /// 
+    /// assert_eq!(maybe.unwrap_or_else(|| 666), 777);
+    /// 
+    /// let empty = MaybeCell::none_like(&maybe);
+    /// 
+    /// assert_eq!(empty.unwrap_or_else(|| 666), 666);
+    /// ```
     pub fn unwrap_or_else<F>(self, default: F) -> T
     where
         F: FnOnce() -> T,
@@ -523,6 +703,21 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         self.unwrap()
     }
+    /// Unwraps the [MaybeCell](MaybeCell) and returns its internal value, if it exists. Otherwise returns [T::default()](core::default::Default::default)
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = MaybeCell::some(777);
+    /// 
+    /// assert_eq!(maybe.unwrap_or_default(), 777);
+    /// 
+    /// let empty = MaybeCell::none_like(&maybe);
+    /// 
+    /// assert_eq!(empty.unwrap_or_default(), 0);
+    /// ```
     pub fn unwrap_or_default(self) -> T
     where
         T: Sized + Default
@@ -533,44 +728,19 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         self.unwrap()
     }
-    const fn assume_none() -> Self
-    {
-        if IS_SOME
-        {
-            const fn ct() -> !
-            {
-                panic!("Tried to assume None on Some.")
-            }
-            fn rt<T>() -> !
-            {
-                panic!("Tried to assume None on Some<{}>.", core::any::type_name::<T>())
-            }
-            #[allow(unused_unsafe)]
-            unsafe {
-                core::intrinsics::const_eval_select((), ct, rt::<T>)
-            }
-        }
-        Self(crate::assume_same(()))
-    }
-    const fn assume_some(value: T) -> Self
-    {
-        if !IS_SOME
-        {
-            const fn ct() -> !
-            {
-                panic!("Tried to assume Some on None.")
-            }
-            fn rt<T>() -> !
-            {
-                panic!("Tried to assume Some<{}> on None.", core::any::type_name::<T>())
-            }
-            #[allow(unused_unsafe)]
-            unsafe {
-                core::intrinsics::const_eval_select((), ct, rt::<T>)
-            }
-        }
-        Self(crate::assume_same(value))
-    }
+    /// Maps the internal value using a mapping function.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = MaybeCell::some(666);
+    /// 
+    /// let mapped = maybe.map(|x| x + 111);
+    /// 
+    /// assert_eq!(mapped, MaybeCell::some(777));
+    /// ```
     pub fn map<U, F>(self, map: F) -> MaybeCell<U, IS_SOME>
     where
         F: FnOnce(T) -> U
@@ -581,6 +751,22 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         MaybeCell::assume_some(map(self.unwrap()))
     }
+    /// Maps the internal value using a mapping function, if it exists. Otherwise returns `default`.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = MaybeCell::some(666);
+    /// let empty = MaybeCell::none_like(&maybe);
+    /// 
+    /// let mapped_maybe = maybe.map_or(999, |x| x + 111);
+    /// let mapped_empty = empty.map_or(999, |x| x + 111);
+    /// 
+    /// assert_eq!(mapped_maybe, 777);
+    /// assert_eq!(mapped_empty, 999);
+    /// ```
     pub fn map_or<U, F>(self, default: U, map: F) -> U
     where
         F: FnOnce(T) -> U,
@@ -592,6 +778,22 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         map(self.unwrap())
     }
+    /// Maps the internal value using a mapping function, if it exists. Otherwise returns the result of `default`.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = MaybeCell::some(666);
+    /// let empty = MaybeCell::none_like(&maybe);
+    /// 
+    /// let mapped_maybe = maybe.map_or_else(|| 999, |x| x + 111);
+    /// let mapped_empty = empty.map_or_else(|| 999, |x| x + 111);
+    /// 
+    /// assert_eq!(mapped_maybe, 777);
+    /// assert_eq!(mapped_empty, 999);
+    /// ```
     pub fn map_or_else<U, D, F>(self, default: D, map: F) -> U
     where
         D: FnOnce() -> U,
@@ -604,6 +806,24 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         map(self.unwrap())
     }
+    /// Converts the [MaybeCell](MaybeCell) into a [Result](core::result::Result), with value `Ok` if the cell contains a value, otherwise `Err` containing `error`.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// use option_trait::*;
+    /// 
+    /// let maybe = MaybeCell::some("All right");
+    /// let empty = MaybeCell::none_like(&maybe);
+    /// 
+    /// let mapped_maybe = maybe.ok_or("Wrong");
+    /// let mapped_empty = empty.ok_or("Wrong");
+    /// 
+    /// assert_eq!(mapped_maybe, Ok("All right"));
+    /// assert_eq!(mapped_empty, Err("Wrong"));
+    /// ```
     pub fn ok_or<E>(self, error: E) -> Result<T, E>
     where
         T: Sized
@@ -614,6 +834,25 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         Ok(self.unwrap())
     }
+    /// Converts the [MaybeCell](MaybeCell) into a [Result](core::result::Result), with value `Ok` if the cell contains a value,
+    /// otherwise `Err` containing the reuslt of `error`.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// use option_trait::*;
+    /// 
+    /// let maybe = MaybeCell::some("All right");
+    /// let empty = MaybeCell::none_like(&maybe);
+    /// 
+    /// let mapped_maybe = maybe.ok_or_else(|| "Wrong");
+    /// let mapped_empty = empty.ok_or_else(|| "Wrong");
+    /// 
+    /// assert_eq!(mapped_maybe, Ok("All right"));
+    /// assert_eq!(mapped_empty, Err("Wrong"));
+    /// ```
     pub fn ok_or_else<E, F>(self, error: F) -> Result<T, E>
     where
         F: FnOnce() -> E,
@@ -625,6 +864,25 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         Ok(self.unwrap())
     }
+    /// Retrieves the [Deref](core::ops::Deref) result of the  internal value in the form of a [MaybeCell](MaybeCell).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let text = String::from("Sample text");
+    /// 
+    /// let maybe = MaybeCell::some(text);
+    /// 
+    /// assert!(maybe.is_some());
+    /// assert_eq!(maybe.unwrap_ref(), &String::from("Sample text"));
+    /// 
+    /// let maybe_ref = maybe.as_deref();
+    /// 
+    /// assert!(maybe_ref.is_some());
+    /// assert_eq!(maybe_ref.unwrap(), "Sample text");
+    /// ```
     pub const fn as_deref<'a>(&'a self) -> <Self as Maybe<T>>::AsDeref<'a>
     where
         T: ~const Deref + 'a
@@ -635,6 +893,25 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         MaybeCell::assume_some(self.unwrap_ref().deref())
     }
+    /// Retrieves the [DerefMut](core::ops::DerefMut) result of the  internal value in the form of a [MaybeCell](MaybeCell).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let text = String::from("Sample text");
+    /// 
+    /// let mut maybe = MaybeCell::some(text);
+    /// 
+    /// assert!(maybe.is_some());
+    /// assert_eq!(maybe.unwrap_mut(), &mut String::from("Sample text"));
+    /// 
+    /// let maybe_ref = maybe.as_deref_mut();
+    /// 
+    /// assert!(maybe_ref.is_some());
+    /// assert_eq!(maybe_ref.unwrap(), "Sample text");
+    /// ```
     pub const fn as_deref_mut<'a>(&'a mut self) -> <Self as Maybe<T>>::AsDerefMut<'a>
     where
         T: ~const DerefMut + 'a
@@ -645,6 +922,31 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         MaybeCell::assume_some(self.unwrap_mut().deref_mut())
     }
+    /// Returns the last of the two maybes, if both have a value, otherwise returns an empty maybe.
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let a = EmptyCell::<&'static str>::none();
+    /// let b = EmptyCell::<&'static str>::none();
+    /// 
+    /// assert_eq!(a.and(b), ());
+    /// 
+    /// let a = MaybeCell::some("First");
+    /// let b = EmptyCell::<&'static str>::none();
+    /// 
+    /// assert_eq!(a.and(b), ());
+    /// 
+    /// let a = EmptyCell::<&'static str>::none();
+    /// let b = MaybeCell::some("Second");
+    /// 
+    /// assert_eq!(a.and(b), ());
+    /// 
+    /// let a = MaybeCell::some("First");
+    /// let b = MaybeCell::some("Second");
+    /// 
+    /// assert_eq!(a.and(b), "Second");
+    /// ```
     pub fn and<Rhs>(self, other: Rhs) -> <<Self as Maybe<T>>::Pure as MaybeAnd<T, Rhs::Pure>>::Output
     where
         Rhs: Maybe<T>,
@@ -654,13 +956,27 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     {
         Maybe::and(self, other)
     }
-    pub fn and_then<F, U, Rhs>(self, and_then: F) -> <<Self as Maybe<T>>::Pure as MaybeAndThen<T, U, Rhs::Pure>>::Output
+    /// Maps the value into a different maybe if it exists using a flatmap function.
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe1 = MaybeCell::some("abcdefg");
+    /// let maybe2 = MaybeCell::some("abcdef");
+    /// 
+    /// let result1 = maybe1.and_then::<&str, _>(|value| if value.len() > 6 {None} else {Some(value)});
+    /// let result2 = maybe2.and_then::<&str, _>(|value| if value.len() > 6 {None} else {Some(value)});
+    /// 
+    /// assert_eq!(result1, None);
+    /// assert_eq!(result2, Some("abcdef"));
+    /// ```
+    #[doc(alias = "flatmap")]
+    pub fn and_then<U, F>(self, and_then: F) -> <<Self as Maybe<T>>::Pure as MaybeAndThen<T, U, <<F as FnOnce<(T,)>>::Output as Maybe<U>>::Pure>>::Output
     where
-        F: FnOnce(T) -> Rhs,
-        Rhs: Maybe<U>,
-        Rhs::Pure: Sized,
+        F: FnOnce<(T,), Output: Maybe<U>>,
+        <<F as FnOnce<(T,)>>::Output as Maybe<U>>::Pure: Sized,
         (): StaticMaybe<T> + StaticMaybe<U>,
-        <<Self as Maybe<T>>::Pure as MaybeAndThen<T, U, Rhs::Pure>>::Output: Sized
+        <<Self as Maybe<T>>::Pure as MaybeAndThen<T, U, <<F as FnOnce<(T,)>>::Output as Maybe<U>>::Pure>>::Output: Sized
     {
         Maybe::and_then(self, and_then)
     }
@@ -681,13 +997,11 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     {
         Maybe::or(self, other)
     }
-    pub fn or_else<Rhs, F>(self, or_else: F) -> <<Self as Maybe<T>>::Pure as MaybeOr<T, Rhs::Pure>>::Output
+    pub fn or_else<F>(self, or_else: F) -> <<Self as Maybe<T>>::Pure as MaybeOr<T, <<F as FnOnce<()>>::Output as Maybe<T>>::Pure>>::Output
     where
-        F: FnOnce() -> Rhs,
-        Rhs: Maybe<T>,
-        Rhs::Pure: Sized,
+        F: FnOnce<(), Output: Maybe<T, Pure: Sized>>,
         (): StaticMaybe<T>,
-        <<Self as Maybe<T>>::Pure as MaybeOr<T, Rhs::Pure>>::Output: Sized
+        <<Self as Maybe<T>>::Pure as MaybeOr<T, <<F as FnOnce<()>>::Output as Maybe<T>>::Pure>>::Output: Sized
     {
         Maybe::or_else(self, or_else)
     }
@@ -761,6 +1075,53 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
             crate::transmute_same_size_mut(self)
         }
     }
+
+    const fn on_unwrap_empty_msg(msg: &str) -> !
+    {
+        panic!("{}", msg)
+    }
+    const fn on_unwrap_empty() -> !
+    {
+        panic!("called `MaybeCell::unwrap()` on a `None` value")
+    }
+    const fn assume_none() -> Self
+    {
+        if IS_SOME
+        {
+            const fn ct() -> !
+            {
+                panic!("Tried to assume None on Some.")
+            }
+            fn rt<T>() -> !
+            {
+                panic!("Tried to assume None on Some<{}>.", core::any::type_name::<T>())
+            }
+            #[allow(unused_unsafe)]
+            unsafe {
+                core::intrinsics::const_eval_select((), ct, rt::<T>)
+            }
+        }
+        Self(crate::assume_same(()))
+    }
+    const fn assume_some(value: T) -> Self
+    {
+        if !IS_SOME
+        {
+            const fn ct() -> !
+            {
+                panic!("Tried to assume Some on None.")
+            }
+            fn rt<T>() -> !
+            {
+                panic!("Tried to assume Some<{}> on None.", core::any::type_name::<T>())
+            }
+            #[allow(unused_unsafe)]
+            unsafe {
+                core::intrinsics::const_eval_select((), ct, rt::<T>)
+            }
+        }
+        Self(crate::assume_same(value))
+    }
 }
 
 impl<T, const IS_SOME: bool> Clone for MaybeCell<T, IS_SOME>
@@ -822,6 +1183,13 @@ impl<'a, T, const IS_SOME: bool> IntoIterator for &'a mut MaybeCell<T, IS_SOME>
     fn into_iter(self) -> Self::IntoIter
     {
         self.iter_mut()
+    }
+}
+impl<T> From<()> for MaybeCell<T, false>
+{
+    fn from((): ()) -> Self
+    {
+        Self::none()
     }
 }
 impl<T> From<T> for MaybeCell<T, true>
