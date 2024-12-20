@@ -980,6 +980,22 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     {
         Maybe::and_then(self, and_then)
     }
+    /// Filters the internal value depending on a predicate.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe1 = MaybeCell::some("abcdefg");
+    /// let maybe2 = MaybeCell::some("abcdef");
+    /// 
+    /// let result1 = maybe1.filter(|value| value.len() <= 6);
+    /// let result2 = maybe2.filter(|value| value.len() <= 6);
+    /// 
+    /// assert_eq!(result1, None);
+    /// assert_eq!(result2, Some("abcdef"));
+    /// ```
     pub fn filter<F>(self, predicate: F) -> <<Self as Maybe<T>>::Pure as MaybeFilter<T>>::Output
     where
         F: Fn(&T) -> bool,
@@ -988,6 +1004,31 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     {
         Maybe::filter(self, predicate)
     }
+    /// Returns the first of the two maybes, if any of them have a value, otherwise returns an empty maybe.
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let a = EmptyCell::<&'static str>::none();
+    /// let b = EmptyCell::<&'static str>::none();
+    /// 
+    /// assert_eq!(a.or(b), ());
+    /// 
+    /// let a = MaybeCell::some("First");
+    /// let b = EmptyCell::<&'static str>::none();
+    /// 
+    /// assert_eq!(a.or(b), "First");
+    /// 
+    /// let a = EmptyCell::<&'static str>::none();
+    /// let b = MaybeCell::some("Second");
+    /// 
+    /// assert_eq!(a.or(b), "Second");
+    /// 
+    /// let a = MaybeCell::some("First");
+    /// let b = MaybeCell::some("Second");
+    /// 
+    /// assert_eq!(a.or(b), "First");
+    /// ```
     pub fn or<Rhs>(self, other: Rhs) -> <<Self as Maybe<T>>::Pure as MaybeOr<T, Rhs::Pure>>::Output
     where
         Rhs: Maybe<T>,
@@ -997,6 +1038,31 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     {
         Maybe::or(self, other)
     }
+    /// Returns the first of the two maybes, if any of them have a value, otherwise returns an empty maybe.
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let a = EmptyCell::<&'static str>::none();
+    /// let b = EmptyCell::<&'static str>::none();
+    /// 
+    /// assert_eq!(a.or_else(|| b), ());
+    /// 
+    /// let a = MaybeCell::some("First");
+    /// let b = EmptyCell::<&'static str>::none();
+    /// 
+    /// assert_eq!(a.or_else(|| b), "First");
+    /// 
+    /// let a = EmptyCell::<&'static str>::none();
+    /// let b = MaybeCell::some("Second");
+    /// 
+    /// assert_eq!(a.or_else(|| b), "Second");
+    /// 
+    /// let a = MaybeCell::some("First");
+    /// let b = MaybeCell::some("Second");
+    /// 
+    /// assert_eq!(a.or_else(|| b), "First");
+    /// ```
     pub fn or_else<F>(self, or_else: F) -> <<Self as Maybe<T>>::Pure as MaybeOr<T, <<F as FnOnce<()>>::Output as Maybe<T>>::Pure>>::Output
     where
         F: FnOnce<(), Output: Maybe<T, Pure: Sized>>,
@@ -1005,6 +1071,31 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     {
         Maybe::or_else(self, or_else)
     }
+    /// Returns the first of the two maybes, if exactly one of them have a value, otherwise returns an empty maybe.
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let a = EmptyCell::<&'static str>::none();
+    /// let b = EmptyCell::<&'static str>::none();
+    /// 
+    /// assert_eq!(a.xor(b), ());
+    /// 
+    /// let a = MaybeCell::some("First");
+    /// let b = EmptyCell::<&'static str>::none();
+    /// 
+    /// assert_eq!(a.xor(b), "First");
+    /// 
+    /// let a = EmptyCell::<&'static str>::none();
+    /// let b = MaybeCell::some("Second");
+    /// 
+    /// assert_eq!(a.xor(b), "Second");
+    /// 
+    /// let a = MaybeCell::some("First");
+    /// let b = MaybeCell::some("Second");
+    /// 
+    /// assert_eq!(a.xor(b), ());
+    /// ```
     pub fn xor<Rhs>(self, other: Rhs) -> <<Self as Maybe<T>>::Pure as MaybeXor<T, Rhs::Pure>>::Output
     where
         Rhs: Maybe<T>,
@@ -1014,6 +1105,25 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
     {
         Maybe::xor(self, other)
     }
+    /// Copies the internal value in the form of a [MaybeCell](MaybeCell).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let value = 777;
+    /// 
+    /// let maybe = MaybeCell::some(&value);
+    /// 
+    /// assert!(maybe.is_some());
+    /// assert_eq!(maybe.unwrap(), &value);
+    /// 
+    /// let copy = maybe.copied();
+    /// 
+    /// assert!(copy.is_some());
+    /// assert_eq!(copy.unwrap(), 777);
+    /// ```
     pub const fn copied(&self) -> <Self as Maybe<T>>::Copied
     where
         Copied<T>: Copy,
@@ -1025,6 +1135,25 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
         MaybeCell::assume_some(crate::copy_ref(self.unwrap_ref()))
     }
+    /// Clones the internal value in the form of a [MaybeCell](MaybeCell).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let value = vec![1, 2, 3];
+    /// 
+    /// let maybe = MaybeCell::some(&value);
+    /// 
+    /// assert!(maybe.is_some());
+    /// assert_eq!(maybe.unwrap(), &value);
+    /// 
+    /// let copy = maybe.cloned();
+    /// 
+    /// assert!(copy.is_some());
+    /// assert_eq!(copy.unwrap(), vec![1, 2, 3]);
+    /// ```
     pub fn cloned(&self) -> <Self as Maybe<T>>::Copied
     where
         Copied<T>: Clone,
@@ -1037,6 +1166,20 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         MaybeCell::assume_some(crate::clone_ref(self.unwrap_ref()))
     }
 
+    /// Iterates on the maybe by reference.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = MaybeCell::some(777);
+    /// 
+    /// for &value in maybe.iter()
+    /// {
+    ///     assert_eq!(value, 777);
+    /// }
+    /// ```
     pub fn iter(&self) -> core::option::Iter<T>
     {
         unsafe {
@@ -1047,6 +1190,22 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
         }
     }
 
+    /// Iterates on the maybe by reference.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let mut maybe = MaybeCell::some(666);
+    /// 
+    /// for value in maybe.iter_mut()
+    /// {
+    ///     *value = 777
+    /// }
+    /// 
+    /// assert_eq!(maybe, MaybeCell::some(777));
+    /// ```
     pub fn iter_mut(&mut self) -> core::option::IterMut<T>
     {
         unsafe {
@@ -1054,25 +1213,6 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
                 core::option::IntoIter<&mut T>,
                 core::option::IterMut<T>
             >(self.as_option_mut().into_iter())
-        }
-    }
-
-    pub const fn voidify(self) -> MaybeCell<<T as private::_Spec<IS_SOME>>::Pure, IS_SOME>
-    {
-        unsafe {
-            crate::transmute_same_size(self)
-        }
-    }
-    pub const fn voidify_ref(&self) -> &MaybeCell<<T as private::_Spec<IS_SOME>>::Pure, IS_SOME>
-    {
-        unsafe {
-            crate::transmute_same_size_ref(self)
-        }
-    }
-    pub const fn voidify_mut(&mut self) -> &mut MaybeCell<<T as private::_Spec<IS_SOME>>::Pure, IS_SOME>
-    {
-        unsafe {
-            crate::transmute_same_size_mut(self)
         }
     }
 
@@ -1248,11 +1388,7 @@ where
         {
             return !A
         }
-        self.voidify_ref()
-            .unwrap_ref()
-            .eq(other.voidify_ref()
-                .unwrap_ref()
-            )
+        self.0.eq(&other.0)
     }
 
     fn ne(&self, other: &MaybeCell<U, B>) -> bool
@@ -1261,11 +1397,7 @@ where
         {
             return A
         }
-        self.voidify_ref()
-            .unwrap_ref()
-            .ne(other.voidify_ref()
-                .unwrap_ref()
-            )
+        self.0.ne(&other.0)
     }
 }
 impl<T, const IS_SOME: bool> Eq for MaybeCell<T, IS_SOME>
@@ -1283,7 +1415,7 @@ where
     {
         match (A, B)
         {
-            (true, true) => self.voidify_ref().unwrap_ref().partial_cmp(other.voidify_ref().unwrap_ref()),
+            (true, true) => self.0.partial_cmp(&other.0),
             (true, false) => Some(Ordering::Greater),
             (false, true) => Some(Ordering::Less),
             (false, false) => Some(Ordering::Equal)
@@ -1301,7 +1433,7 @@ where
         {
             return Ordering::Equal
         }
-        self.voidify_ref().unwrap_ref().cmp(other.voidify_ref().unwrap_ref())
+        self.0.cmp(&other.0)
     }
 }
 
@@ -1331,7 +1463,7 @@ where
         if IS_SOME
         {
             f.debug_tuple("Some")
-                .field(self.voidify_ref().unwrap_ref())
+                .field(&self.0)
                 .finish()
         }
         else
@@ -1704,5 +1836,21 @@ mod private
             M: ?Sized,
             O: ?Sized;
         type Pure = T;
+    }
+}
+
+#[cfg(test)]
+mod test
+{
+    use super::{EmptyCell, MaybeCell};
+
+    #[test]
+    fn it_works()
+    {
+        let maybe = MaybeCell::some(777);
+        let empty = EmptyCell::none_like(&maybe);
+
+        println!("{:?}", maybe);
+        println!("{:?}", empty);
     }
 }

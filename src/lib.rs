@@ -1,4 +1,4 @@
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 #![allow(internal_features)]
 #![feature(const_trait_impl)]
 #![feature(auto_traits)]
