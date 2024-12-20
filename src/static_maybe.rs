@@ -1,4 +1,4 @@
-use crate::{Maybe, MaybeCell, NotVoid};
+use crate::{Maybe, NotVoid, PureStaticMaybe};
 
 pub trait StaticMaybe<T>: Maybe<T>
 where
@@ -13,10 +13,10 @@ where
     type Opposite: StaticMaybe<T> + ?Sized
     where
         (): StaticMaybe<T>;
-    type Maybe<M>: StaticMaybe<M> + ?Sized
+    type Maybe<M>: PureStaticMaybe<M> + ?Sized
     where
-        M: StaticMaybe<M> + ?Sized,
-        (): StaticMaybe<M>;
+        M: ?Sized,
+        (): PureStaticMaybe<M>;
     type MaybeOr<M, O>: ?Sized
     where
         M: ?Sized,
@@ -65,27 +65,14 @@ where
     fn maybe_or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
     where
         M: FnOnce<()>,
-        O: FnOnce<()>;
-
-    fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
-    where
-        F: FnOnce<(T,)>,
-        F::Output: StaticMaybe<F::Output>,
-        (): StaticMaybe<F::Output>,
-        T: Sized,
-        Self::Maybe<F::Output>: Sized;
-
-    fn maybe(self) -> Self::Maybe<T>
-    where
-        T: Sized + StaticMaybe<T>,
-        (): StaticMaybe<T>,
-        Self::Maybe<T>: Sized;
+        O: FnOnce<()>,
+        Self::MaybeOr<M::Output, O::Output>: Sized;
 
     fn into_value(self) -> T
     where
         Self: StaticMaybe<T, Maybe<T> = T>,
-        T: StaticMaybe<T> + Sized,
-        (): StaticMaybe<T>,
+        T: Sized,
+        (): PureStaticMaybe<T>,
         Self: Sized
     {
         self.unwrap()
@@ -106,8 +93,8 @@ where
         (): StaticMaybe<Some>;
     type Maybe<M> = M
     where
-        M: StaticMaybe<M> + ?Sized,
-        (): StaticMaybe<M>;
+        M: ?Sized,
+        (): PureStaticMaybe<M>;
     type MaybeOr<M, O> = M
     where
         M: ?Sized,
@@ -129,24 +116,6 @@ where
         core::mem::drop(or);
         maybe()
     }
-
-    fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
-    where
-        F: FnOnce<(Some,)>,
-        F::Output: StaticMaybe<F::Output>,
-        (): StaticMaybe<F::Output>,
-        Some: Sized,
-        Self::Maybe<F::Output>: Sized
-    {
-        StaticMaybe::maybe_from_fn(|| map(self))
-    }
-    fn maybe(self) -> Self::Maybe<Some>
-    where
-        Some: Sized,
-        (): StaticMaybe<Some>
-    {
-        self
-    }
 }
 impl<Some> /*const*/ StaticMaybe<Some> for ()
 where
@@ -159,8 +128,8 @@ where
     type Opposite = Some;
     type Maybe<M> = ()
     where
-        M: StaticMaybe<M> + ?Sized,
-        (): StaticMaybe<M>;
+        M: ?Sized,
+        (): PureStaticMaybe<M>;
     type MaybeOr<M, O> = O
     where
         M: ?Sized,
@@ -182,25 +151,6 @@ where
         core::mem::drop(maybe);
         or()
     }
-
-    fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
-    where
-        F: FnOnce<(Some,)>,
-        F::Output: StaticMaybe<F::Output>,
-        (): StaticMaybe<F::Output>,
-        Some: Sized,
-        Self::Maybe<F::Output>: Sized
-    {
-        core::mem::drop(map);
-        StaticMaybe::maybe_from_fn(|| panic!())
-    }
-    fn maybe(self) -> Self::Maybe<Some>
-    where
-        Some: Sized + StaticMaybe<Some>,
-        Self::Maybe<Some>: Sized
-    {
-        
-    }
 }
 impl<Some> /*const*/ StaticMaybe<Some> for [Some; 0]
 where
@@ -217,8 +167,8 @@ where
         (): StaticMaybe<Some>;
     type Maybe<M> = ()
     where
-        M: StaticMaybe<M> + ?Sized,
-        (): StaticMaybe<M>;
+        M: ?Sized,
+        (): PureStaticMaybe<M>;
     type MaybeOr<M, O> = O
     where
         M: ?Sized,
@@ -241,26 +191,6 @@ where
         core::mem::drop(maybe);
         or()
     }
-
-    fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
-    where
-        F: FnOnce<(Some,)>,
-        F::Output: StaticMaybe<F::Output>,
-        (): StaticMaybe<F::Output>,
-        Some: Sized,
-        Self::Maybe<F::Output>: Sized
-    {
-        core::mem::drop(map);
-        StaticMaybe::maybe_from_fn(|| panic!())
-    }
-    fn maybe(self) -> Self::Maybe<Some>
-    where
-        Some: Sized + StaticMaybe<Some>,
-        (): StaticMaybe<Some>,
-        Self::Maybe<Some>: Sized
-    {
-        
-    }
 }
 impl<Some> /*const*/ StaticMaybe<Some> for [Some; 1]
 where
@@ -277,8 +207,8 @@ where
         (): StaticMaybe<Some>;
     type Maybe<M> = M
     where
-        M: StaticMaybe<M> + ?Sized,
-        (): StaticMaybe<M>;
+        M: ?Sized,
+        (): PureStaticMaybe<M>;
     type MaybeOr<M, O> = M
     where
         M: ?Sized,
@@ -299,148 +229,6 @@ where
     {
         core::mem::drop(or);
         maybe()
-    }
-
-    fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
-    where
-        F: FnOnce<(Some,)>,
-        F::Output: StaticMaybe<F::Output>,
-        (): StaticMaybe<F::Output>,
-        Some: Sized,
-        Self::Maybe<F::Output>: Sized
-    {
-        let value = unsafe {
-            core::ptr::read(&self[0])
-        };
-        core::mem::forget(self);
-        StaticMaybe::maybe_from_fn(|| {
-            map(value)
-        })
-    }
-    fn maybe(self) -> Self::Maybe<Some>
-    where
-        Some: Sized + StaticMaybe<Some>,
-        (): StaticMaybe<Some>,
-        Self::Maybe<Some>: Sized
-    {
-        self.unwrap()
-    }
-}
-impl<Some> /*const*/ StaticMaybe<Some> for MaybeCell<Some, true>
-where
-    Some: StaticMaybe<Some>
-{
-    const IS_SOME: bool = true;
-    const IS_NONE: bool = false;
-    type None = MaybeCell<Some, false>
-    where
-        (): StaticMaybe<Some>;
-    type Some = MaybeCell<Some, true>;
-    type Opposite = Self::None
-    where
-        (): StaticMaybe<Some>;
-    type Maybe<M> = M
-    where
-        M: StaticMaybe<M> + ?Sized,
-        (): StaticMaybe<M>;
-    type MaybeOr<M, O> = M
-    where
-        M: ?Sized,
-        O: ?Sized;
-
-    fn maybe_from_fn<F>(func: F) -> Self
-    where
-        F: FnOnce() -> Some,
-        Some: Sized
-    {
-        Self::from_fn(func)
-    }
-    
-    fn maybe_or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
-    where
-        M: FnOnce<()>,
-        O: FnOnce<()>
-    {
-        core::mem::drop(or);
-        maybe()
-    }
-
-    fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
-    where
-        F: FnOnce<(Some,)>,
-        F::Output: StaticMaybe<F::Output>,
-        (): StaticMaybe<F::Output>,
-        Some: Sized,
-        Self::Maybe<F::Output>: Sized
-    {
-        StaticMaybe::maybe_from_fn(|| map(self.into_value()))
-    }
-    fn maybe(self) -> Self::Maybe<Some>
-    where
-        Some: Sized + StaticMaybe<Some>,
-        (): StaticMaybe<Some>,
-        Self::Maybe<Some>: Sized
-    {
-        self.into_value()
-    }
-}
-impl<Some> /*const*/ StaticMaybe<Some> for MaybeCell<Some, false>
-where
-    Some: StaticMaybe<Some>
-{
-    const IS_SOME: bool = false;
-    const IS_NONE: bool = true;
-    type None = MaybeCell<Some, false>
-    where
-        (): StaticMaybe<Some>;
-    type Some = MaybeCell<Some, true>;
-    type Opposite = Self::Some
-    where
-        (): StaticMaybe<Some>;
-    type Maybe<M> = ()
-    where
-        M: StaticMaybe<M> + ?Sized,
-        (): StaticMaybe<M>;
-    type MaybeOr<M, O> = O
-    where
-        M: ?Sized,
-        O: ?Sized;
-
-    fn maybe_from_fn<F>(func: F) -> Self
-    where
-        F: FnOnce() -> Some,
-        Some: Sized
-    {
-        Self::from_fn(func)
-    }
-    
-    fn maybe_or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
-    where
-        M: FnOnce<()>,
-        O: FnOnce<()>
-    {
-        core::mem::drop(maybe);
-        or()
-    }
-
-    fn maybe_map<F>(self, map: F) -> Self::Maybe<F::Output>
-    where
-        F: FnOnce<(Some,)>,
-        F::Output: StaticMaybe<F::Output>,
-        (): StaticMaybe<F::Output>,
-        Some: Sized,
-        Self::Maybe<F::Output>: Sized
-    {
-        core::mem::drop(map);
-        StaticMaybe::maybe_from_fn(|| panic!())
-    }
-    fn maybe(self) -> Self::Maybe<Some>
-    where
-        Some: Sized + StaticMaybe<Some>,
-        (): StaticMaybe<Some>,
-        Self::Maybe<Some>: Sized
-    {
-        
     }
 }
 

@@ -1,5 +1,7 @@
 #![no_std]
 
+#![allow(internal_features)]
+
 #![feature(const_trait_impl)]
 #![feature(auto_traits)]
 #![feature(negative_impls)]
@@ -11,6 +13,7 @@
 #![feature(const_destruct)]
 #![feature(adt_const_params)]
 #![feature(associated_const_equality)]
+#![feature(structural_match)]
 
 #![feature(core_intrinsics)]
 #![feature(specialization)]
@@ -27,10 +30,33 @@ moddef::moddef!(
         maybe,
         maybe_cell,
         pure_maybe,
+        pure_static_maybe,
         not_void,
         static_maybe
     }
 );
+
+const unsafe fn transmute_same_size<T, U>(value: T) -> U
+{
+    assert!(core::mem::size_of::<T>() == core::mem::size_of::<U>());
+    unsafe {
+        core::intrinsics::transmute_unchecked::<T, U>(value)
+    }
+}
+const unsafe fn transmute_same_size_ref<T, U>(value: &T) -> &U
+{
+    assert!(core::mem::size_of::<T>() == core::mem::size_of::<U>());
+    unsafe {
+        core::mem::transmute::<&T, &U>(value)
+    }
+}
+const unsafe fn transmute_same_size_mut<T, U>(value: &mut T) -> &mut U
+{
+    assert!(core::mem::size_of::<T>() == core::mem::size_of::<U>());
+    unsafe {
+        core::mem::transmute::<&mut T, &mut U>(value)
+    }
+}
 
 const fn is_same_type<T, U>() -> bool
 where
