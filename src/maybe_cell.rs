@@ -1186,7 +1186,7 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
             crate::transmute_same_size::<
                 core::option::IntoIter<&T>,
                 core::option::Iter<T>
-            >(self.as_option().into_iter())
+            >(self.get().into_iter())
         }
     }
 
@@ -1212,7 +1212,7 @@ impl<T, const IS_SOME: bool> MaybeCell<T, IS_SOME>
             crate::transmute_same_size::<
                 core::option::IntoIter<&mut T>,
                 core::option::IterMut<T>
-            >(self.as_option_mut().into_iter())
+            >(self.get_mut().into_iter())
         }
     }
 
@@ -1350,14 +1350,14 @@ impl<'a, T, const IS_SOME: bool> Into<Option<&'a T>> for &'a MaybeCell<T, IS_SOM
 {
     fn into(self) -> Option<&'a T>
     {
-        self.as_option()
+        self.get()
     }
 }
 impl<'a, T, const IS_SOME: bool> Into<Option<&'a mut T>> for &'a mut MaybeCell<T, IS_SOME>
 {
     fn into(self) -> Option<&'a mut T>
     {
-        self.as_option_mut()
+        self.get_mut()
     }
 }
 impl<'a, T, const IS_SOME: bool> From<&'a MaybeCell<T, IS_SOME>> for MaybeCell<&'a T, IS_SOME>
