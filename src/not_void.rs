@@ -24,3 +24,35 @@ impl<T> NotVoid for &T where T: ?Sized {}
 impl<T> NotVoid for &mut T where T: ?Sized {}
 impl<T> NotVoid for *const T where T: ?Sized {}
 impl<T> NotVoid for *mut T where T: ?Sized {}
+
+
+/*pub trait NotVoid: private::_NotVoid<Void = ()>
+{
+
+}
+impl<T> NotVoid for T
+where
+    T: private::_NotVoid<Void = ()>
+{
+    
+}
+impl !NotVoid for ()
+{
+    
+}
+
+mod private
+{
+    pub trait _NotVoid
+    {
+        type Void;
+    }
+    impl<T> _NotVoid for T
+    {
+        default type Void = ();
+    }
+    impl _NotVoid for ()
+    {
+        type Void = !;
+    }
+}*/

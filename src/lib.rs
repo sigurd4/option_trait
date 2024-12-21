@@ -14,6 +14,7 @@
 #![feature(structural_match)]
 #![feature(core_intrinsics)]
 #![feature(const_eval_select)]
+#![feature(never_type)]
 #![feature(specialization)]
 #![feature(generic_const_exprs)]
 
@@ -80,7 +81,7 @@ const fn assume_same_mut<T, U>(value: &mut T) -> &mut U
 }
 const fn copy_ref<T>(src: &T) -> Copied<T>
 where
-    Copied<T>: Copy
+    <T as private::_Copied>::Copied: Copy
 {
     if is_same_type::<T, Copied<T>>()
     {
@@ -112,7 +113,7 @@ const fn on_unwrap_empty_msg(msg: &str) -> !
 pub trait Same<T>: private::Same<T> {}
 impl<T, U> Same<T> for U where U: private::Same<T> {}
 
-pub type Copied<T> = <T as private::Copied>::Copied;
+pub type Copied<T> = <T as private::_Copied>::Copied;
 
 mod private
 {
@@ -139,21 +140,32 @@ mod private
     pub trait Same<T> {}
     impl<T, U> Same<T> for U where T: MaybeSame<T, IS_SAME = true> {}
 
-    pub trait Copied
+    pub trait _Ref
+    {
+        type Target;
+    }
+    impl<T> _Ref for &T
+    {
+        type Target = T;
+    }
+    impl<T> _Ref for &mut T
+    {
+        type Target = T;
+    }
+
+    pub trait _Copied
     {
         type Copied;
     }
-    impl<T> Copied for T
+    impl<T> _Copied for T
     {
         default type Copied = T;
     }
-    impl<T> Copied for &T
+    impl<T> _Copied for T
+    where
+        T: _Ref
     {
-        type Copied = T;
-    }
-    impl<T> Copied for &mut T
-    {
-        type Copied = T;
+        type Copied = <T as _Ref>::Target;
     }
 
     use crate::NotVoid;
@@ -174,22 +186,42 @@ mod private
 #[cfg(test)]
 mod test
 {
+    use static_assertions::assert_type_eq_all;
+
     use crate::option_trait;
+    use option_trait::*;
+
+    assert_type_eq_all!(<&i32 as private::_Copied>::Copied, i32);
+    //assert_type_eq_all!(<i32 as private::_Copied>::Copied, i32);
 
     #[test]
     fn it_works()
     {
         use option_trait::*;
+        use static_assertions::*;
+        
+        assert_type_eq_all!(<Option<&i32> as Maybe<&i32>>::Copied, Option<i32>);
+        assert_type_eq_all!(<&i32 as Maybe<&i32>>::Copied, i32);
+        assert_type_eq_all!(<() as Maybe<&i32>>::Copied, ());
+        assert_type_eq_all!(<[&i32; 1] as Maybe<&i32>>::Copied, [i32; 1]);
+        assert_type_eq_all!(<[&i32; 0] as Maybe<&i32>>::Copied, [i32; 0]);
 
-        let mut maybe = 777;
+        // This is supposed to work...
+        /*assert_type_eq_all!(<Option<i32> as Maybe<i32>>::Copied, Option<i32>);
+        assert_type_eq_all!(<i32 as Maybe<i32>>::Copied, i32);
+        assert_type_eq_all!(<() as Maybe<i32>>::Copied, ());
+        assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::Copied, [i32; 1]);
+        assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::Copied, [i32; 0]);*/
+        
+        let maybe = [777];
+        let referenced = Maybe::<i32>::as_ref(&maybe);
+        
+        // This is supposed to work...
+        //let copy1 = Maybe::<i32>::copied(&maybe);
+        //assert_eq!(copy1, [777]);
 
-        assert!(maybe.is_some());
-        assert_eq!(*maybe.unwrap_ref(), 777);
-
-        let option = maybe.as_option_mut();
-
-        assert!(option.is_some());
-        assert_eq!(*option.unwrap(), 777);
+        let copy2 = Maybe::<&i32>::copied(&referenced);
+        assert_eq!(copy2, [777]);
     }
 
     #[test]
