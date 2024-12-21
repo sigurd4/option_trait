@@ -1435,7 +1435,7 @@ where
     }
 }
 
-impl<T> Deref for MaybeCell<T, true>
+impl<T> const Deref for MaybeCell<T, true>
 {
     type Target = T;
 
@@ -1444,7 +1444,7 @@ impl<T> Deref for MaybeCell<T, true>
         self.as_value()
     }
 }
-impl<T> DerefMut for MaybeCell<T, true>
+impl<T> const DerefMut for MaybeCell<T, true>
 {
     fn deref_mut(&mut self) -> &mut Self::Target
     {

@@ -17,6 +17,9 @@
 #![feature(specialization)]
 #![feature(generic_const_exprs)]
 
+//! Provides a trait for [Option](core::option::Option)s, as well as compile-time managed [Option](core::option::Option) alternatives,
+//! generalized under the trait [Maybe](Maybe).
+
 moddef::moddef!(
     pub mod {
         ops
