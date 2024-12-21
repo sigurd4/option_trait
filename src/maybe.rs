@@ -2,7 +2,7 @@ use core::{ops::{Deref, DerefMut}, pin::Pin};
 
 use crate::{ops::{MaybeAnd, MaybeAndThen, MaybeFilter, MaybeOr, MaybeXor}, private, Copied, NotVoid, PureMaybe, StaticMaybe};
 
-pub trait Maybe<T>: private::Maybe<T>
+pub trait Maybe<T>
 where
     T: ?Sized
 {

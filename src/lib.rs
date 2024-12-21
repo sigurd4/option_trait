@@ -154,19 +154,7 @@ mod private
     pub trait Optional {}
     impl<T> Optional for Option<T> {}
 
-    pub trait Maybe<T>
-    where
-        T: ?Sized
-    {
-    }
-    impl<T> Maybe<T> for Option<T> {}
-    impl<T> Maybe<T> for T where T: ?Sized {}
-    impl<T> Maybe<T> for () where T: NotVoid + ?Sized {}
-    impl<T> Maybe<T> for [T; 0] {}
-    impl<T> Maybe<T> for [T; 1] {}
-    impl<T, const IS_SOME: bool> Maybe<T> for MaybeCell<T, IS_SOME> {}
-
-    pub trait PureMaybe<T>: Maybe<T>
+    pub trait PureMaybe<T>
     where
         T: ?Sized
     {

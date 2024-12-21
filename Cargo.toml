@@ -3,6 +3,8 @@ name = "option_trait"
 version = "0.1.16"
 edition = "2021"
 license = "MIT"
+keywords = ["option", "util", "ops", "trait"]
+categories = ["rust-patterns", "no-std::no-alloc"]
 description = "Helper traits for more generalized options"
 repository = "https://github.com/sigurd4/option_trait"
 
