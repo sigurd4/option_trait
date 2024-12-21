@@ -1410,7 +1410,6 @@ impl<T, U, const A: bool, const B: bool> PartialOrd<MaybeCell<U, B>> for MaybeCe
 where
     <T as private::_Spec<A>>::Pure: PartialOrd<<U as private::_Spec<B>>::Pure>
 {
-    #[inline]
     fn partial_cmp(&self, other: &MaybeCell<U, B>) -> Option<Ordering>
     {
         match (A, B)
@@ -1426,7 +1425,6 @@ impl<T, const IS_SOME: bool> Ord for MaybeCell<T, IS_SOME>
 where
     <T as private::_Spec<IS_SOME>>::Pure: Ord
 {
-    #[inline]
     fn cmp(&self, other: &MaybeCell<T, IS_SOME>) -> Ordering
     {
         if !IS_SOME
