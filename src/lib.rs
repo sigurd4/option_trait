@@ -41,7 +41,7 @@ const unsafe fn transmute_same_size<T, U>(value: T) -> U
     assert!(core::mem::size_of::<T>() == core::mem::size_of::<U>());
     unsafe { core::intrinsics::transmute_unchecked::<T, U>(value) }
 }
-const unsafe fn transmute_same_size_ref<T, U>(value: &T) -> &U
+/*const unsafe fn transmute_same_size_ref<T, U>(value: &T) -> &U
 {
     assert!(core::mem::size_of::<T>() == core::mem::size_of::<U>());
     unsafe { core::mem::transmute::<&T, &U>(value) }
@@ -50,7 +50,7 @@ const unsafe fn transmute_same_size_mut<T, U>(value: &mut T) -> &mut U
 {
     assert!(core::mem::size_of::<T>() == core::mem::size_of::<U>());
     unsafe { core::mem::transmute::<&mut T, &mut U>(value) }
-}
+}*/
 
 const fn is_same_type<T, U>() -> bool
 where
@@ -179,7 +179,20 @@ mod test
     use crate::option_trait;
 
     #[test]
-    fn it_works() {}
+    fn it_works()
+    {
+        use option_trait::*;
+
+        let mut maybe = MaybeCell::some(777);
+
+        assert!(maybe.is_some());
+        assert_eq!(maybe.as_value(), &777);
+
+        let option = maybe.get_mut();
+
+        assert!(option.is_some());
+        assert_eq!(*option.unwrap(), 777);
+    }
 
     #[test]
     fn pinned()
