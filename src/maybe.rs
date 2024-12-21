@@ -6,22 +6,37 @@ pub trait Maybe<T>
 where
     T: ?Sized
 {
+    /// Either `T`, `()` or an [Option](core::option::Option) containing `T`.
+    /// 
+    /// This is an option if the maybe is run-time managed, otherwise it's the inner type or void if compile-time managed.
     type Pure: PureMaybe<T> + ?Sized
     where
         T: StaticMaybe<T>,
         (): StaticMaybe<T>;
+    /// Either `&T`, `()` or an [Option](core::option::Option) containing `&T`.
+    /// 
+    /// This is an option if the maybe is run-time managed, otherwise it's the inner type or void if compile-time managed.
     type PureRef<'a>: PureMaybe<&'a T>
     where
         Self: 'a,
         T: 'a;
+    /// Either `&mut T`, `()` or an [Option](core::option::Option) containing `&mut T`.
+    /// 
+    /// This is an option if the maybe is run-time managed, otherwise it's the inner type or void if compile-time managed.
     type PureMut<'a>: PureMaybe<&'a mut T>
     where
         Self: 'a,
         T: 'a;
+    /// Either [Pin<&T>](core::pin::Pin), `()` or an [Option](core::option::Option) containing [Pin<&T>](core::pin::Pin).
+    /// 
+    /// This is an option if the maybe is run-time managed, otherwise it's the inner type or void if compile-time managed.
     type PurePinRef<'a>: PureMaybe<Pin<&'a T>>
     where
         Self: 'a,
         T: 'a;
+    /// Either [Pin<&mut T>](core::pin::Pin), `()` or an [Option](core::option::Option) containing [Pin<&mut T>](core::pin::Pin).
+    /// 
+    /// This is an option if the maybe is run-time managed, otherwise it's the inner type or void if compile-time managed.
     type PurePinMut<'a>: PureMaybe<Pin<&'a mut T>>
     where
         Self: 'a,
@@ -86,13 +101,49 @@ where
     fn unwrap(self) -> T
     where
         T: Sized;
+    fn unwrap_ref(&self) -> &T;
+    fn unwrap_mut(&mut self) -> &mut T;
+    fn unwrap_pin_ref<'a>(self: Pin<&'a Self>) -> Pin<&'a T>
+    where
+        T: 'a;
+    fn unwrap_pin_mut<'a>(self: Pin<&'a mut Self>) -> Pin<&'a mut T>
+    where
+        T: 'a;
     fn unwrap_or(self, default: T) -> T
     where
         T: Sized;
+    fn unwrap_ref_or<'a>(&'a self, default: &'a T) -> &'a T
+    where
+        T: 'a;
+    fn unwrap_mut_or<'a>(&'a mut self, default: &'a mut T) -> &'a mut T
+    where
+        T: 'a;
+    fn unwrap_pin_ref_or<'a>(self: Pin<&'a Self>, default: Pin<&'a T>) -> Pin<&'a T>
+    where
+        T: 'a;
+    fn unwrap_pin_mut_or<'a>(self: Pin<&'a mut Self>, default: Pin<&'a mut T>) -> Pin<&'a mut T>
+    where
+        T: 'a;
     fn unwrap_or_else<F>(self, default: F) -> T
     where
         F: FnOnce() -> T,
         T: Sized;
+    fn unwrap_ref_or_else<'a, F>(&'a self, default: F) -> &'a T
+    where
+        F: FnOnce() -> &'a T,
+        T: 'a;
+    fn unwrap_mut_or_else<'a, F>(&'a mut self, default: F) -> &'a mut T
+    where
+        F: FnOnce() -> &'a mut T,
+        T: 'a;
+    fn unwrap_pin_ref_or_else<'a, F>(self: Pin<&'a Self>, default: F) -> Pin<&'a T>
+    where
+        F: FnOnce() -> Pin<&'a T>,
+        T: 'a;
+    fn unwrap_pin_mut_or_else<'a, F>(self: Pin<&'a mut Self>, default: F) -> Pin<&'a mut T>
+    where
+        F: FnOnce() -> Pin<&'a mut T>,
+        T: 'a;
     fn unwrap_or_default(self) -> T
     where
         T: Sized + Default;
@@ -325,18 +376,89 @@ where
     {
         self
     }
+    fn unwrap_ref(&self) -> &T
+    {
+        self
+    }
+    fn unwrap_mut(&mut self) -> &mut T
+    {
+        self
+    }
+    fn unwrap_pin_ref<'a>(self: Pin<&'a Self>) -> Pin<&'a T>
+    where
+        T: 'a
+    {
+        self
+    }
+    fn unwrap_pin_mut<'a>(self: Pin<&'a mut Self>) -> Pin<&'a mut T>
+    where
+        T: 'a
+    {
+        self
+    }
     fn unwrap_or(self, _: T) -> T
     where
         T: Sized
     {
         self
     }
-    fn unwrap_or_else<F>(self, default: F) -> T
+    fn unwrap_ref_or<'a>(&'a self, _: &'a T) -> &'a T
+    where
+        T: 'a
+    {
+        self
+    }
+    fn unwrap_mut_or<'a>(&'a mut self, _: &'a mut T) -> &'a mut T
+    where
+        T: 'a
+    {
+        self
+    }
+    fn unwrap_pin_ref_or<'a>(self: Pin<&'a Self>, _: Pin<&'a T>) -> Pin<&'a T>
+    where
+        T: 'a
+    {
+        self
+    }
+    fn unwrap_pin_mut_or<'a>(self: Pin<&'a mut Self>, _: Pin<&'a mut T>) -> Pin<&'a mut T>
+    where
+        T: 'a
+    {
+        self
+    }
+    fn unwrap_or_else<F>(self, _: F) -> T
     where
         F: FnOnce() -> T,
         T: Sized
     {
-        core::mem::drop(default);
+        self
+    }
+    fn unwrap_ref_or_else<'a, F>(&'a self, _: F) -> &'a T
+    where
+        F: FnOnce() -> &'a T,
+        T: 'a
+    {
+        self
+    }
+    fn unwrap_mut_or_else<'a, F>(&'a mut self, _: F) -> &'a mut T
+    where
+        F: FnOnce() -> &'a mut T,
+        T: 'a
+    {
+        self
+    }
+    fn unwrap_pin_ref_or_else<'a, F>(self: Pin<&'a Self>, _: F) -> Pin<&'a T>
+    where
+        F: FnOnce() -> Pin<&'a T>,
+        T: 'a
+    {
+        self
+    }
+    fn unwrap_pin_mut_or_else<'a, F>(self: Pin<&'a mut Self>, _: F) -> Pin<&'a mut T>
+    where
+        F: FnOnce() -> Pin<&'a mut T>,
+        T: 'a
+    {
         self
     }
     fn unwrap_or_default(self) -> T
@@ -546,13 +668,33 @@ where
     where
         T: Sized
     {
-        [].expect(msg)
+        crate::on_unwrap_empty_msg(msg)
     }
     fn unwrap(self) -> T
     where
         T: Sized
     {
-        [].unwrap()
+        crate::on_unwrap_empty()
+    }
+    fn unwrap_ref(&self) -> &T
+    {
+        crate::on_unwrap_empty()
+    }
+    fn unwrap_mut(&mut self) -> &mut T
+    {
+        crate::on_unwrap_empty()
+    }
+    fn unwrap_pin_ref<'a>(self: Pin<&'a Self>) -> Pin<&'a T>
+    where
+        T: 'a
+    {
+        crate::on_unwrap_empty()
+    }
+    fn unwrap_pin_mut<'a>(self: Pin<&'a mut Self>) -> Pin<&'a mut T>
+    where
+        T: 'a
+    {
+        crate::on_unwrap_empty()
     }
     fn unwrap_or(self, default: T) -> T
     where
@@ -560,10 +702,62 @@ where
     {
         default
     }
+    fn unwrap_ref_or<'a>(&'a self, default: &'a T) -> &'a T
+    where
+        T: 'a
+    {
+        default
+    }
+    fn unwrap_mut_or<'a>(&'a mut self, default: &'a mut T) -> &'a mut T
+    where
+        T: 'a
+    {
+        default
+    }
+    fn unwrap_pin_ref_or<'a>(self: Pin<&'a Self>, default: Pin<&'a T>) -> Pin<&'a T>
+    where
+        T: 'a
+    {
+        default
+    }
+    fn unwrap_pin_mut_or<'a>(self: Pin<&'a mut Self>, default: Pin<&'a mut T>) -> Pin<&'a mut T>
+    where
+        T: 'a
+    {
+        default
+    }
     fn unwrap_or_else<F>(self, default: F) -> T
     where
         F: FnOnce() -> T,
         T: Sized
+    {
+        default()
+    }
+    fn unwrap_ref_or_else<'a, F>(&'a self, default: F) -> &'a T
+    where
+        F: FnOnce() -> &'a T,
+        T: 'a
+    {
+        default()
+    }
+    fn unwrap_mut_or_else<'a, F>(&'a mut self, default: F) -> &'a mut T
+    where
+        F: FnOnce() -> &'a mut T,
+        T: 'a
+    {
+        default()
+    }
+    fn unwrap_pin_ref_or_else<'a, F>(self: Pin<&'a Self>, default: F) -> Pin<&'a T>
+    where
+        F: FnOnce() -> Pin<&'a T>,
+        T: 'a
+    {
+        default()
+    }
+    fn unwrap_pin_mut_or_else<'a, F>(self: Pin<&'a mut Self>, default: F) -> Pin<&'a mut T>
+    where
+        F: FnOnce() -> Pin<&'a mut T>,
+        T: 'a
     {
         default()
     }
@@ -779,11 +973,55 @@ impl<T> /*const*/ Maybe<T> for Option<T>
     {
         self.unwrap()
     }
+    fn unwrap_ref(&self) -> &T
+    {
+        self.as_ref().unwrap()
+    }
+    fn unwrap_mut(&mut self) -> &mut T
+    {
+        self.as_mut().unwrap()
+    }
+    fn unwrap_pin_ref<'a>(self: Pin<&'a Self>) -> Pin<&'a T>
+    where
+        T: 'a
+    {
+        self.as_pin_ref().unwrap()
+    }
+    fn unwrap_pin_mut<'a>(self: Pin<&'a mut Self>) -> Pin<&'a mut T>
+    where
+        T: 'a
+    {
+        self.as_pin_mut().unwrap()
+    }
     fn unwrap_or(self, default: T) -> T
     where
         T: Sized
     {
         self.unwrap_or(default)
+    }
+    fn unwrap_ref_or<'a>(&'a self, default: &'a T) -> &'a T
+    where
+        T: 'a
+    {
+        self.as_ref().unwrap_or(default)
+    }
+    fn unwrap_mut_or<'a>(&'a mut self, default: &'a mut T) -> &'a mut T
+    where
+        T: 'a
+    {
+        self.as_mut().unwrap_or(default)
+    }
+    fn unwrap_pin_ref_or<'a>(self: Pin<&'a Self>, default: Pin<&'a T>) -> Pin<&'a T>
+    where
+        T: 'a
+    {
+        self.as_pin_ref().unwrap_or(default)
+    }
+    fn unwrap_pin_mut_or<'a>(self: Pin<&'a mut Self>, default: Pin<&'a mut T>) -> Pin<&'a mut T>
+    where
+        T: 'a
+    {
+        self.as_pin_mut().unwrap_or(default)
     }
     fn unwrap_or_else<F>(self, default: F) -> T
     where
@@ -791,6 +1029,34 @@ impl<T> /*const*/ Maybe<T> for Option<T>
         T: Sized
     {
         self.unwrap_or_else(default)
+    }
+    fn unwrap_ref_or_else<'a, F>(&'a self, default: F) -> &'a T
+    where
+        F: FnOnce() -> &'a T,
+        T: 'a
+    {
+        self.as_ref().unwrap_or_else(default)
+    }
+    fn unwrap_mut_or_else<'a, F>(&'a mut self, default: F) -> &'a mut T
+    where
+        F: FnOnce() -> &'a mut T,
+        T: 'a
+    {
+        self.as_mut().unwrap_or_else(default)
+    }
+    fn unwrap_pin_ref_or_else<'a, F>(self: Pin<&'a Self>, default: F) -> Pin<&'a T>
+    where
+        F: FnOnce() -> Pin<&'a T>,
+        T: 'a
+    {
+        self.as_pin_ref().unwrap_or_else(default)
+    }
+    fn unwrap_pin_mut_or_else<'a, F>(self: Pin<&'a mut Self>, default: F) -> Pin<&'a mut T>
+    where
+        F: FnOnce() -> Pin<&'a mut T>,
+        T: 'a
+    {
+        self.as_pin_mut().unwrap_or_else(default)
     }
     fn unwrap_or_default(self) -> T
     where
@@ -999,13 +1265,33 @@ impl<T> /*const*/ Maybe<T> for [T; 0]
     where
         T: Sized
     {
-        panic!("{}", msg)
+        crate::on_unwrap_empty_msg(msg)
     }
     fn unwrap(self) -> T
     where
         T: Sized
     {
-        panic!("called `Maybe::unwrap()` on a `None` value")
+        crate::on_unwrap_empty()
+    }
+    fn unwrap_ref(&self) -> &T
+    {
+        crate::on_unwrap_empty()
+    }
+    fn unwrap_mut(&mut self) -> &mut T
+    {
+        crate::on_unwrap_empty()
+    }
+    fn unwrap_pin_ref<'a>(self: Pin<&'a Self>) -> Pin<&'a T>
+    where
+        T: 'a
+    {
+        crate::on_unwrap_empty()
+    }
+    fn unwrap_pin_mut<'a>(self: Pin<&'a mut Self>) -> Pin<&'a mut T>
+    where
+        T: 'a
+    {
+        crate::on_unwrap_empty()
     }
     fn unwrap_or(self, default: T) -> T
     where
@@ -1013,10 +1299,62 @@ impl<T> /*const*/ Maybe<T> for [T; 0]
     {
         default
     }
+    fn unwrap_ref_or<'a>(&'a self, default: &'a T) -> &'a T
+    where
+        T: 'a
+    {
+        default
+    }
+    fn unwrap_mut_or<'a>(&'a mut self, default: &'a mut T) -> &'a mut T
+    where
+        T: 'a
+    {
+        default
+    }
+    fn unwrap_pin_ref_or<'a>(self: Pin<&'a Self>, default: Pin<&'a T>) -> Pin<&'a T>
+    where
+        T: 'a
+    {
+        default
+    }
+    fn unwrap_pin_mut_or<'a>(self: Pin<&'a mut Self>, default: Pin<&'a mut T>) -> Pin<&'a mut T>
+    where
+        T: 'a
+    {
+        default
+    }
     fn unwrap_or_else<F>(self, default: F) -> T
     where
         F: FnOnce() -> T,
         T: Sized
+    {
+        default()
+    }
+    fn unwrap_ref_or_else<'a, F>(&'a self, default: F) -> &'a T
+    where
+        F: FnOnce() -> &'a T,
+        T: 'a
+    {
+        default()
+    }
+    fn unwrap_mut_or_else<'a, F>(&'a mut self, default: F) -> &'a mut T
+    where
+        F: FnOnce() -> &'a mut T,
+        T: 'a
+    {
+        default()
+    }
+    fn unwrap_pin_ref_or_else<'a, F>(self: Pin<&'a Self>, default: F) -> Pin<&'a T>
+    where
+        F: FnOnce() -> Pin<&'a T>,
+        T: 'a
+    {
+        default()
+    }
+    fn unwrap_pin_mut_or_else<'a, F>(self: Pin<&'a mut Self>, default: F) -> Pin<&'a mut T>
+    where
+        F: FnOnce() -> Pin<&'a mut T>,
+        T: 'a
     {
         default()
     }
@@ -1242,11 +1580,32 @@ impl<T> /*const*/ Maybe<T> for [T; 1]
     where
         T: Sized
     {
-        let value = unsafe {
-            core::ptr::read(&self[0])
-        };
-        core::mem::drop(self);
+        let [value] = self;
         value
+    }
+    fn unwrap_ref(&self) -> &T
+    {
+        &self[0]
+    }
+    fn unwrap_mut(&mut self) -> &mut T
+    {
+        &mut self[0]
+    }
+    fn unwrap_pin_ref<'a>(self: Pin<&'a Self>) -> Pin<&'a T>
+    where
+        T: 'a
+    {
+        unsafe {
+            self.map_unchecked(|this| this.unwrap_ref())
+        }
+    }
+    fn unwrap_pin_mut<'a>(self: Pin<&'a mut Self>) -> Pin<&'a mut T>
+    where
+        T: 'a
+    {
+        unsafe {
+            self.map_unchecked_mut(|this| this.unwrap_mut())
+        }
     }
     fn unwrap_or(self, _: T) -> T
     where
@@ -1254,12 +1613,64 @@ impl<T> /*const*/ Maybe<T> for [T; 1]
     {
         self.unwrap()
     }
+    fn unwrap_ref_or<'a>(&'a self, _: &'a T) -> &'a T
+    where
+        T: 'a
+    {
+        self.unwrap_ref()
+    }
+    fn unwrap_mut_or<'a>(&'a mut self, _: &'a mut T) -> &'a mut T
+    where
+        T: 'a
+    {
+        self.unwrap_mut()
+    }
+    fn unwrap_pin_ref_or<'a>(self: Pin<&'a Self>, _: Pin<&'a T>) -> Pin<&'a T>
+    where
+        T: 'a
+    {
+        self.unwrap_pin_ref()
+    }
+    fn unwrap_pin_mut_or<'a>(self: Pin<&'a mut Self>, _: Pin<&'a mut T>) -> Pin<&'a mut T>
+    where
+        T: 'a
+    {
+        self.unwrap_pin_mut()
+    }
     fn unwrap_or_else<F>(self, _: F) -> T
     where
         F: FnOnce() -> T,
         T: Sized
     {
         self.unwrap()
+    }
+    fn unwrap_ref_or_else<'a, F>(&'a self, _: F) -> &'a T
+    where
+        F: FnOnce() -> &'a T,
+        T: 'a
+    {
+        self.unwrap_ref()
+    }
+    fn unwrap_mut_or_else<'a, F>(&'a mut self, _: F) -> &'a mut T
+    where
+        F: FnOnce() -> &'a mut T,
+        T: 'a
+    {
+        self.unwrap_mut()
+    }
+    fn unwrap_pin_ref_or_else<'a, F>(self: Pin<&'a Self>, _: F) -> Pin<&'a T>
+    where
+        F: FnOnce() -> Pin<&'a T>,
+        T: 'a
+    {
+        self.unwrap_pin_ref()
+    }
+    fn unwrap_pin_mut_or_else<'a, F>(self: Pin<&'a mut Self>, _: F) -> Pin<&'a mut T>
+    where
+        F: FnOnce() -> Pin<&'a mut T>,
+        T: 'a
+    {
+        self.unwrap_pin_mut()
     }
     fn unwrap_or_default(self) -> T
     where

@@ -29,7 +29,6 @@ moddef::moddef!(
         option_obj,
         optional,
         maybe,
-        maybe_cell,
         pure_maybe,
         pure_static_maybe,
         not_void,
@@ -101,6 +100,14 @@ where
     assert!(is_same_type::<T, &Copied<T>>() || is_same_type::<T, &mut Copied<T>>());
     unsafe { (*core::intrinsics::transmute::<&T, &&Copied<T>>(src)).clone() }
 }
+const fn on_unwrap_empty() -> !
+{
+    panic!("called `Maybe::unwrap()` on a `None` value")
+}
+const fn on_unwrap_empty_msg(msg: &str) -> !
+{
+    panic!("{}", msg)
+}
 
 pub trait Same<T>: private::Same<T> {}
 impl<T, U> Same<T> for U where U: private::Same<T> {}
@@ -149,7 +156,7 @@ mod private
         type Copied = T;
     }
 
-    use crate::{MaybeCell, NotVoid};
+    use crate::NotVoid;
 
     pub trait Optional {}
     impl<T> Optional for Option<T> {}
@@ -174,12 +181,12 @@ mod test
     {
         use option_trait::*;
 
-        let mut maybe = MaybeCell::some(777);
+        let mut maybe = 777;
 
         assert!(maybe.is_some());
-        assert_eq!(maybe.as_value(), &777);
+        assert_eq!(*maybe.unwrap_ref(), 777);
 
-        let option = maybe.get_mut();
+        let option = maybe.as_option_mut();
 
         assert!(option.is_some());
         assert_eq!(*option.unwrap(), 777);
@@ -190,12 +197,12 @@ mod test
     {
         use option_trait::*;
 
-        let maybe = core::pin::pin!(MaybeCell::some(777));
+        let maybe = core::pin::pin!(777);
 
         assert!(maybe.is_some());
-        assert_eq!(maybe.as_value(), &777);
+        assert_eq!(**maybe.unwrap_ref(), 777);
 
-        let option = maybe.get_pin_mut();
+        let option = maybe.as_option_pin_mut();
 
         assert!(option.is_some());
         assert_eq!(*option.unwrap(), 777);
