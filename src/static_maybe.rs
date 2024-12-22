@@ -5,6 +5,7 @@ pub trait StaticMaybe<T>: Maybe<T>
 where
     T: ?Sized
 {
+
     const IS_SOME: bool;
     const IS_NONE: bool;
     type Some: StaticMaybe<T> + ?Sized;
@@ -69,6 +70,19 @@ where
         O: FnOnce<()>,
         Self::MaybeOr<M::Output, O::Output>: Sized;
 
+    /// Unwraps the maybe into its inner value. This one won't panic, as opposed to [`Maybe::unwrap()`](crate::Maybe::unwrap).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = ["turnip"];
+    /// 
+    /// let value = StaticMaybe::<&str>::into_value(maybe);
+    /// 
+    /// assert_eq!(value, "turnip");
+    /// ```
     fn into_value(self) -> T
     where
         Self: StaticMaybe<T, Maybe<T> = T>,

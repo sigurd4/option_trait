@@ -158,7 +158,7 @@ pub trait Optional: private::Optional + PureMaybe<Self::Some> + From<Option<Self
     /// 
     /// let mut option = Some(69);
     /// 
-    /// let taken = Optional::take_if(&mut option, |x| x == 69);
+    /// let taken = Optional::take_if(&mut option, |x| *x == 69);
     /// 
     /// assert_eq!(taken, Some(69));
     /// assert_eq!(option, None);
