@@ -95,7 +95,7 @@ pub trait Maybe<T>
 where
     T: ?Sized
 {
-    /// Either `T`, `()` or an [Option](core::option::Option) containing `T`.
+    /// Either `T`, `()` or an [`Option`](core::option::Option) containing `T`.
     /// 
     /// This is an option if the maybe is run-time managed, otherwise it's the inner type or void if compile-time managed.
     /// 
@@ -121,7 +121,7 @@ where
     where
         T: StaticMaybe<T>,
         (): StaticMaybe<T>;
-    /// Either `&T`, `()` or an [Option](core::option::Option) containing `&T`.
+    /// Either `&T`, `()` or an [`Option`](core::option::Option) containing `&T`.
     /// 
     /// This is an option if the maybe is run-time managed, otherwise it's the inner type or void if compile-time managed.
     /// 
@@ -147,7 +147,7 @@ where
     where
         Self: 'a,
         T: 'a;
-    /// Either `&mut T`, `()` or an [Option](core::option::Option) containing `&mut T`.
+    /// Either `&mut T`, `()` or an [`Option`](core::option::Option) containing `&mut T`.
     /// 
     /// This is an option if the maybe is run-time managed, otherwise it's the inner type or void if compile-time managed.
     /// 
@@ -173,7 +173,7 @@ where
     where
         Self: 'a,
         T: 'a;
-    /// Either [Pin<&T>](core::pin::Pin), `()` or an [Option](core::option::Option) containing [Pin<&T>](core::pin::Pin).
+    /// Either [`Pin<&T>`](core::pin::Pin), `()` or an [`Option`](core::option::Option) containing [`Pin<&T>`](core::pin::Pin).
     /// 
     /// This is an option if the maybe is run-time managed, otherwise it's the inner type or void if compile-time managed.
     /// 
@@ -200,7 +200,7 @@ where
     where
         Self: 'a,
         T: 'a;
-    /// Either [Pin<&mut T>](core::pin::Pin), `()` or an [Option](core::option::Option) containing [Pin<&mut T>](core::pin::Pin).
+    /// Either [`Pin<&mut T>`](core::pin::Pin), `()` or an [`Option`](core::option::Option) containing [`Pin<&mut T>`](core::pin::Pin).
     /// 
     /// This is an option if the maybe is run-time managed, otherwise it's the inner type or void if compile-time managed.
     /// 
@@ -852,7 +852,7 @@ where
     where
         F: FnOnce() -> Pin<&'a mut T>,
         T: 'a;
-    /// Returns the internal value, if it exists. Otherwise returns the result of [T::default()](core::default::Default::default).
+    /// Returns the internal value, if it exists. Otherwise returns the result of [`T::default()`](core::default::Default::default).
     /// 
     /// # Examples
     /// 
@@ -934,7 +934,7 @@ where
         D: FnOnce() -> U,
         F: FnOnce(T) -> U,
         T: Sized;
-    /// Returns an [Ok](core::result::Result::Ok) containing the internal value, otherwise returns [Err](core::result::Result::Err) containing `error`.
+    /// Returns an [`Ok`](core::result::Result::Ok) containing the internal value, otherwise returns [`Err`](core::result::Result::Err) containing `error`.
     /// 
     /// # Examples
     /// 
@@ -953,7 +953,7 @@ where
     fn ok_or<E>(self, error: E) -> Result<T, E>
     where
         T: Sized;
-    /// Returns an [Ok](core::result::Result::Ok) containing the internal value, otherwise returns [Err](core::result::Result::Err) containing the result of `error`.
+    /// Returns an [`Ok`](core::result::Result::Ok) containing the internal value, otherwise returns [`Err`](core::result::Result::Err) containing the result of `error`.
     /// 
     /// # Examples
     /// 
@@ -1243,7 +1243,7 @@ where
         T: Sized,
         (): StaticMaybe<Copied<T>>;
 
-    /// Converts this maybe into an [Option](core::option::Option).
+    /// Converts this maybe into an [`Option`](core::option::Option).
     /// 
     /// # Examples
     /// 
@@ -1262,7 +1262,7 @@ where
     fn option(self) -> Option<T>
     where
         T: Sized;
-    /// Retrieves the internal value in the form of an [Option](core::option::Option).
+    /// Retrieves the internal value in the form of an [`Option`](core::option::Option).
     /// 
     /// # Examples
     /// 
@@ -1279,7 +1279,7 @@ where
     /// assert_eq!(none, None);
     /// ```
     fn option_ref(&self) -> Option<&T>;
-    /// Mutably retrieves the internal value in the form of an [Option](core::option::Option).
+    /// Mutably retrieves the internal value in the form of an [`Option`](core::option::Option).
     /// 
     /// # Examples
     /// 
@@ -1296,7 +1296,7 @@ where
     /// assert_eq!(none, None);
     /// ```
     fn option_mut(&mut self) -> Option<&mut T>;
-    /// Retrieves the pinned internal value in the form of an [Option](core::option::Option).
+    /// Retrieves the pinned internal value in the form of an [`Option`](core::option::Option).
     /// 
     /// # Examples
     /// 
@@ -1313,7 +1313,7 @@ where
     /// assert_eq!(none, None);
     /// ```
     fn option_pin_ref(self: Pin<&Self>) -> Option<Pin<&T>>;
-    /// Mutably retrieves the pinned internal value in the form of an [Option](core::option::Option).
+    /// Mutably retrieves the pinned internal value in the form of an [`Option`](core::option::Option).
     /// 
     /// # Examples
     /// 

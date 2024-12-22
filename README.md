@@ -14,4 +14,4 @@
 
 # option_trait
 
-Provides a trait for options, as well as compile-time managed option alternatives, generalized under the trait `Maybe`.
+Provides the `Optional` trait for `Option`s, as well as compile-time managed `Option` alternatives, all generalized under the trait `Maybe`.
