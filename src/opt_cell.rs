@@ -4,7 +4,7 @@ use crate::{ops::{MaybeAnd, MaybeAndThen, MaybeFilter, MaybeOr, MaybeXor}, Copie
 
 /// A struct containing a value of type `T`, if the constant expression `IS_SOME` evaluates to `true`.
 /// 
-/// This is similar to [Option](core::option::Option), except wether or not it contains a value is determined at
+/// This is similar to [`Option`](core::option::Option), except wether or not it contains a value is determined at
 /// compile-time.
 /// 
 /// # Examples
@@ -26,7 +26,7 @@ pub struct OptCell<T, const IS_SOME: bool>(<T as private::_Spec<IS_SOME>>::Pure)
 
 impl<T> OptCell<T, false>
 {
-    /// Creates an empty [OptCell](OptCell).
+    /// Creates an empty [`OptCell`](OptCell).
     /// 
     /// # Examples
     /// 
@@ -42,7 +42,7 @@ impl<T> OptCell<T, false>
         Self::assume_none()
     }
 
-    /// Crates an empty [OptCell](OptCell) for types like those contained in `like`.
+    /// Crates an empty [`OptCell`](OptCell) for types like those contained in `like`.
     /// 
     /// # Examples
     /// 
@@ -60,7 +60,7 @@ impl<T> OptCell<T, false>
         Self::none()
     }
 
-    /// Crates an empty [OptCell](OptCell) for the same type as `like`.
+    /// Crates an empty [`OptCell`](OptCell) for the same type as `like`.
     /// 
     /// # Examples
     /// 
@@ -79,7 +79,7 @@ impl<T> OptCell<T, false>
 }
 impl<T> OptCell<T, true>
 {
-    /// Creates a [OptCell](OptCell) that contains a value.
+    /// Creates a [`OptCell`](OptCell) that contains a value.
     /// 
     /// # Examples
     /// 
@@ -145,7 +145,7 @@ impl<T> OptCell<T, true>
 }
 impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
 {
-    /// Crates an [OptCell](OptCell) that may or may not contain a value from a functor.
+    /// Crates an [`OptCell`](OptCell) that may or may not contain a value from a functor.
     /// 
     /// Wether or not the cell contains a value depends entirely on the constant expression `IS_SOME`.
     /// 
@@ -175,7 +175,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         Self::assume_some(func())
     }
 
-    /// Converts the [OptCell](OptCell) into an [Option](core::option::Option).
+    /// Converts the [`OptCell`](OptCell) into an [`Option`](core::option::Option).
     /// 
     /// The conversion can only go one way, due to the nature of the container types being compile-time managed and run-time managed respectively.
     /// 
@@ -207,7 +207,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
     }
 
-    /// Retrieves the internal value in the form of an [Option](core::option::Option).
+    /// Retrieves the internal value in the form of an [`Option`](core::option::Option).
     /// 
     /// # Examples
     /// 
@@ -236,7 +236,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
     }
 
-    /// Mutably retrieves the internal value in the form of an [Option](core::option::Option).
+    /// Mutably retrieves the internal value in the form of an [`Option`](core::option::Option).
     /// 
     /// # Examples
     /// 
@@ -264,7 +264,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
             None
         }
     }
-    /// Retrieves the pinned internal value in the form of an [Option](core::option::Option).
+    /// Retrieves the pinned internal value in the form of an [`Option`](core::option::Option).
     /// 
     /// # Examples
     /// 
@@ -294,7 +294,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
             None
         }
     }
-    /// Mutably retrieves the pinned internal value in the form of an [Option](core::option::Option).
+    /// Mutably retrieves the pinned internal value in the form of an [`Option`](core::option::Option).
     /// 
     /// # Examples
     /// 
@@ -363,7 +363,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     {
         !IS_SOME
     }
-    /// Retrieves the internal value in the form of a [OptCell](OptCell).
+    /// Retrieves the internal value in the form of a [`OptCell`](OptCell).
     /// 
     /// # Examples
     /// 
@@ -390,7 +390,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         OptCell::assume_some(self.unwrap_ref())
     }
-    /// Mutably retrieves the internal value in the form of a [OptCell](OptCell).
+    /// Mutably retrieves the internal value in the form of a [`OptCell`](OptCell).
     /// 
     /// # Examples
     /// 
@@ -417,7 +417,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         OptCell::assume_some(self.unwrap_mut())
     }
-    /// Retrieves the pinned internal value in the form of an [Option](core::option::Option).
+    /// Retrieves the pinned internal value in the form of an [`Option`](core::option::Option).
     /// 
     /// # Examples
     /// 
@@ -444,7 +444,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         OptCell::assume_some(self.unwrap_pin_ref())
     }
-    /// Retrieves the pinned internal value in the form of an [Option](core::option::Option).
+    /// Retrieves the pinned internal value in the form of an [`Option`](core::option::Option).
     /// 
     /// # Examples
     /// 
@@ -525,7 +525,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         core::slice::from_mut(self.unwrap_mut())
     }
-    /// Unwraps the [OptCell](OptCell) and prints a user defined message upon failure.
+    /// Unwraps the [`OptCell`](OptCell) and prints a user defined message upon failure.
     /// 
     /// # Examples
     /// 
@@ -546,7 +546,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         self.unwrap()
     }
-    /// Unwraps the [OptCell](OptCell) and returns its internal value, if it exists. If not, it will result in an error.
+    /// Unwraps the [`OptCell`](OptCell) and returns its internal value, if it exists. If not, it will result in an error.
     /// 
     /// # Examples
     /// 
@@ -571,7 +571,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         core::mem::forget(self);
         x
     }
-    /// Unwraps the [OptCell](OptCell) and returns its internal value by reference, if it exists. If not, it will result in an error.
+    /// Unwraps the [`OptCell`](OptCell) and returns its internal value by reference, if it exists. If not, it will result in an error.
     /// 
     /// # Examples
     /// 
@@ -590,7 +590,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         crate::assume_same_ref(&self.0)
     }
-    /// Unwraps the [OptCell](OptCell) and returns its internal value by mutable reference, if it exists. If not, it will result in an error.
+    /// Unwraps the [`OptCell`](OptCell) and returns its internal value by mutable reference, if it exists. If not, it will result in an error.
     /// 
     /// # Examples
     /// 
@@ -609,7 +609,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         crate::assume_same_mut(&mut self.0)
     }
-    /// Unwraps the [OptCell](OptCell) and returns its pinned internal value by reference, if it exists. If not, it will result in an error.
+    /// Unwraps the [`OptCell`](OptCell) and returns its pinned internal value by reference, if it exists. If not, it will result in an error.
     /// 
     /// # Examples
     /// 
@@ -631,7 +631,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
             self.map_unchecked(|this| this.unwrap_ref())
         }
     }
-    /// Unwraps the [OptCell](OptCell) and returns its pinned internal value by mutable reference, if it exists. If not, it will result in an error.
+    /// Unwraps the [`OptCell`](OptCell) and returns its pinned internal value by mutable reference, if it exists. If not, it will result in an error.
     /// 
     /// # Examples
     /// 
@@ -652,7 +652,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
             self.map_unchecked_mut(|this| this.unwrap_mut())
         }
     }
-    /// Unwraps the [OptCell](OptCell) and returns its internal value, if it exists. Otherwise returns `default`
+    /// Unwraps the [`OptCell`](OptCell) and returns its internal value, if it exists. Otherwise returns `default`
     /// 
     /// # Examples
     /// 
@@ -677,7 +677,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         self.unwrap()
     }
-    /// Unwraps the [OptCell](OptCell) and returns its internal value by reference, if it exists. Otherwise returns `default`.
+    /// Unwraps the [`OptCell`](OptCell) and returns its internal value by reference, if it exists. Otherwise returns `default`.
     /// 
     /// # Examples
     /// 
@@ -702,7 +702,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         self.unwrap_ref()
     }
-    /// Unwraps the [OptCell](OptCell) and returns its internal value by mutable reference, if it exists. Otherwise returns `default`.
+    /// Unwraps the [`OptCell`](OptCell) and returns its internal value by mutable reference, if it exists. Otherwise returns `default`.
     /// 
     /// # Examples
     /// 
@@ -727,7 +727,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         self.unwrap_mut()
     }
-    /// Unwraps the [OptCell](OptCell) and returns its pinned internal value by reference, if it exists. Otherwise returns `default`.
+    /// Unwraps the [`OptCell`](OptCell) and returns its pinned internal value by reference, if it exists. Otherwise returns `default`.
     /// 
     /// # Examples
     /// 
@@ -753,7 +753,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         self.unwrap_pin_ref()
     }
-    /// Unwraps the [OptCell](OptCell) and returns its pinned internal value by mutable reference, if it exists. Otherwise returns `default`.
+    /// Unwraps the [`OptCell`](OptCell) and returns its pinned internal value by mutable reference, if it exists. Otherwise returns `default`.
     /// 
     /// # Examples
     /// 
@@ -779,7 +779,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         self.unwrap_pin_mut()
     }
-    /// Unwraps the [OptCell](OptCell) and returns its internal value, if it exists. Otherwise returns the result of `default`.
+    /// Unwraps the [`OptCell`](OptCell) and returns its internal value, if it exists. Otherwise returns the result of `default`.
     /// 
     /// # Examples
     /// 
@@ -805,7 +805,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         self.unwrap()
     }
-    /// Unwraps the [OptCell](OptCell) and returns its internal value by reference, if it exists. Otherwise returns the result of `default`.
+    /// Unwraps the [`OptCell`](OptCell) and returns its internal value by reference, if it exists. Otherwise returns the result of `default`.
     /// 
     /// # Examples
     /// 
@@ -831,7 +831,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         self.unwrap_ref()
     }
-    /// Unwraps the [OptCell](OptCell) and returns its internal value by mutable reference, if it exists. Otherwise returns the result of `default`.
+    /// Unwraps the [`OptCell`](OptCell) and returns its internal value by mutable reference, if it exists. Otherwise returns the result of `default`.
     /// 
     /// # Examples
     /// 
@@ -858,7 +858,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         self.unwrap_mut()
     }
-    /// Unwraps the [OptCell](OptCell) and returns its pinned internal value by reference, if it exists. Otherwise returns the result of `default`.
+    /// Unwraps the [`OptCell`](OptCell) and returns its pinned internal value by reference, if it exists. Otherwise returns the result of `default`.
     /// 
     /// # Examples
     /// 
@@ -885,7 +885,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         self.unwrap_pin_ref()
     }
-    /// Unwraps the [OptCell](OptCell) and returns its pinned internal value by mutable reference, if it exists. Otherwise returns the result of `default`.
+    /// Unwraps the [`OptCell`](OptCell) and returns its pinned internal value by mutable reference, if it exists. Otherwise returns the result of `default`.
     /// 
     /// # Examples
     /// 
@@ -912,7 +912,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         self.unwrap_pin_mut()
     }
-    /// Unwraps the [OptCell](OptCell) and returns its internal value, if it exists. Otherwise returns [T::default()](core::default::Default::default)
+    /// Unwraps the [`OptCell`](OptCell) and returns its internal value, if it exists. Otherwise returns [`T::default()`](core::default::Default::default)
     /// 
     /// # Examples
     /// 
@@ -1015,7 +1015,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         map(self.unwrap())
     }
-    /// Converts the [OptCell](OptCell) into a [Result](core::result::Result), with value `Ok` if the cell contains a value, otherwise `Err` containing `error`.
+    /// Converts the [`OptCell`](OptCell) into a [`Result`](core::result::Result), with value `Ok` if the cell contains a value, otherwise `Err` containing `error`.
     /// 
     /// # Examples
     /// 
@@ -1043,7 +1043,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         Ok(self.unwrap())
     }
-    /// Converts the [OptCell](OptCell) into a [Result](core::result::Result), with value `Ok` if the cell contains a value,
+    /// Converts the [`OptCell`](OptCell) into a [`Result`](core::result::Result), with value `Ok` if the cell contains a value,
     /// otherwise `Err` containing the reuslt of `error`.
     /// 
     /// # Examples
@@ -1073,7 +1073,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         Ok(self.unwrap())
     }
-    /// Retrieves the [Deref](core::ops::Deref) result of the  internal value in the form of a [OptCell](OptCell).
+    /// Retrieves the [`Deref`](core::ops::Deref) result of the  internal value in the form of a [`OptCell`](OptCell).
     /// 
     /// # Examples
     /// 
@@ -1102,7 +1102,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         OptCell::assume_some(self.unwrap_ref().deref())
     }
-    /// Retrieves the [DerefMut](core::ops::DerefMut) result of the  internal value in the form of a [OptCell](OptCell).
+    /// Retrieves the [`DerefMut`](core::ops::DerefMut) result of the  internal value in the form of a [`OptCell`](OptCell).
     /// 
     /// # Examples
     /// 
@@ -1314,7 +1314,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     {
         Maybe::xor(self, other)
     }
-    /// Copies the internal value in the form of a [OptCell](OptCell).
+    /// Copies the internal value in the form of a [`OptCell`](OptCell).
     /// 
     /// # Examples
     /// 
@@ -1344,7 +1344,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
         }
         OptCell::assume_some(crate::copy_ref(self.unwrap_ref()))
     }
-    /// Clones the internal value in the form of a [OptCell](OptCell).
+    /// Clones the internal value in the form of a [`OptCell`](OptCell).
     /// 
     /// # Examples
     /// 
