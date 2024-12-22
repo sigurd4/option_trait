@@ -569,7 +569,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
             core::ptr::read(&self.0)
         });
         core::mem::forget(self);
-        return x;
+        x
     }
     /// Unwraps the [OptCell](OptCell) and returns its internal value by reference, if it exists. If not, it will result in an error.
     /// 
@@ -1548,25 +1548,25 @@ impl<T> From<T> for OptCell<T, true>
         Self::some(value)
     }
 }
-impl<T, const IS_SOME: bool> Into<Option<T>> for OptCell<T, IS_SOME>
+impl<T, const IS_SOME: bool> From<OptCell<T, IS_SOME>> for Option<T>
 {
-    fn into(self) -> Option<T>
+    fn from(value: OptCell<T, IS_SOME>) -> Self
     {
-        self.option()
+        value.option()
     }
 }
-impl<'a, T, const IS_SOME: bool> Into<Option<&'a T>> for &'a OptCell<T, IS_SOME>
+impl<'a, T, const IS_SOME: bool> From<&'a OptCell<T, IS_SOME>> for Option<&'a T>
 {
-    fn into(self) -> Option<&'a T>
+    fn from(value: &'a OptCell<T, IS_SOME>) -> Self
     {
-        self.get()
+        value.get()
     }
 }
-impl<'a, T, const IS_SOME: bool> Into<Option<&'a mut T>> for &'a mut OptCell<T, IS_SOME>
+impl<'a, T, const IS_SOME: bool> From<&'a mut OptCell<T, IS_SOME>> for Option<&'a mut T>
 {
-    fn into(self) -> Option<&'a mut T>
+    fn from(value: &'a mut OptCell<T, IS_SOME>) -> Self
     {
-        self.get_mut()
+        value.get_mut()
     }
 }
 impl<'a, T, const IS_SOME: bool> From<&'a OptCell<T, IS_SOME>> for OptCell<&'a T, IS_SOME>
@@ -1598,15 +1598,6 @@ where
             return !A
         }
         self.0.eq(&other.0)
-    }
-
-    fn ne(&self, other: &OptCell<U, B>) -> bool
-    {
-        if A != B || !A
-        {
-            return A
-        }
-        self.0.ne(&other.0)
     }
 }
 impl<T, const IS_SOME: bool> Eq for OptCell<T, IS_SOME>

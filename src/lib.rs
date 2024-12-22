@@ -21,7 +21,7 @@
 
 //! Provides the [`Optional`](Optional) trait for [`Option`](core::option::Option)s, as well as compile-time managed [`Option`](core::option::Option) alternatives,
 //! all generalized under the trait [`Maybe`](Maybe).
-//! 
+//!
 //! [`Maybe<T>`](Maybe) is implemented for:
 //! - [`Option<T>`](core::option::Option)
 //!     - Run-time managed
@@ -38,14 +38,14 @@
 //!     - Can be more easily managed using boolean constant expressions
 //!     - Has const methods
 //!     - Also implements [`StaticMaybe`](StaticMaybe)
-//! 
+//!
 //! # Examples
-//! 
+//!
 //! This is how i like to handle optional function arguments with maximum flexibility.
-//! 
+//!
 //! ```rust
 //! use option_trait::*;
-//! 
+//!
 //! fn f<O>(required: i32, optional: O)
 //! where
 //!     O: Maybe<i32>
@@ -54,10 +54,10 @@
 //!     {
 //!         // This part of the code will be disabled at compile-time if the maybe cannot possibly contain a value.
 //!     }
-//! 
+//!
 //!     // Do whatever
 //! }
-//! 
+//!
 //! f(1, 2);
 //! f(1, ());
 //! f(1, Some(2));
