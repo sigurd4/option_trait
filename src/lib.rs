@@ -53,7 +53,7 @@
 //!     if O::IS_MAYBE_SOME
 //!     {
 //!         let param = optional.unwrap_or(0);
-//! 
+//!
 //!         // This part of the code will be disabled at compile-time if the maybe cannot
 //!         // possibly contain a value.
 //!     }
