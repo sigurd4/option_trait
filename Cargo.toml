@@ -1,6 +1,6 @@
 [package]
 name = "option_trait"
-version = "1.0.3"
+version = "1.0.4"
 edition = "2021"
 license = "MIT"
 keywords = ["option", "util", "ops", "trait"]
@@ -25,4 +25,5 @@ static_assertions = "1.1.0"
 
 [package.metadata.docs.rs]
 
-all-features = true
+#all-features = true
+#no-default-features = true
