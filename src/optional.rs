@@ -1,12 +1,12 @@
 use core::marker::StructuralPartialEq;
 
-use crate::{OptionObj, PureMaybe};
+use crate::{private, PureMaybe};
 
 /// A trait, only implemented by [`Option`](core::option::Option) of any type.
 /// 
 /// This is a run-time managed [`Maybe`](crate::Maybe). Wether or not it contains a value can be decided at run-time.
 //#[const_trait]
-pub trait Optional: OptionObj + PureMaybe<Self::Some> + From<Option<Self::Some>> + Into<Option<Self::Some>> + StructuralPartialEq
+pub trait Optional: private::Optional + PureMaybe<Self::Some> + From<Option<Self::Some>> + Into<Option<Self::Some>> + StructuralPartialEq
 {
     /// The internal type that may or may not exist inside the option.
     /// 

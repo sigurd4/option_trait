@@ -26,8 +26,6 @@ moddef::moddef!(
         ops
     },
     flat(pub) mod {
-        option_kind,
-        option_obj,
         optional,
         maybe,
         pure_maybe,
