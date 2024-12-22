@@ -86,16 +86,19 @@ moddef::moddef!(
 #[allow(unused)]
 use crate as option_trait;
 
+#[allow(unused)]
 const unsafe fn transmute_same_size<T, U>(value: T) -> U
 {
     assert!(core::mem::size_of::<T>() == core::mem::size_of::<U>());
     unsafe { core::intrinsics::transmute_unchecked::<T, U>(value) }
 }
-/*const unsafe fn transmute_same_size_ref<T, U>(value: &T) -> &U
+/*#[allow(unused)]
+const unsafe fn transmute_same_size_ref<T, U>(value: &T) -> &U
 {
     assert!(core::mem::size_of::<T>() == core::mem::size_of::<U>());
     unsafe { core::mem::transmute::<&T, &U>(value) }
-}
+}*/
+/*#[allow(unused)]
 const unsafe fn transmute_same_size_mut<T, U>(value: &mut T) -> &mut U
 {
     assert!(core::mem::size_of::<T>() == core::mem::size_of::<U>());
@@ -111,16 +114,19 @@ where
     <T as private::MaybeSame<U>>::IS_SAME
 }
 
+#[allow(unused)]
 const fn assume_same<T, U>(value: T) -> U
 {
     assert!(is_same_type::<T, U>());
     unsafe { core::intrinsics::transmute_unchecked::<T, U>(value) }
 }
+#[allow(unused)]
 const fn assume_same_ref<T, U>(value: &T) -> &U
 {
     assert!(is_same_type::<T, U>());
     unsafe { core::intrinsics::transmute::<&T, &U>(value) }
 }
+#[allow(unused)]
 const fn assume_same_mut<T, U>(value: &mut T) -> &mut U
 {
     assert!(is_same_type::<T, U>());

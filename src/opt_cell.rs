@@ -1,4 +1,4 @@
-use core::{hash::Hash, cmp::Ordering, fmt::Debug, marker::StructuralPartialEq, mem::MaybeUninit, ops::{Deref, DerefMut}, pin::Pin};
+use core::{hash::Hash, cmp::Ordering, fmt::Debug, marker::StructuralPartialEq, ops::{Deref, DerefMut}, pin::Pin};
 
 use crate::{ops::{MaybeAnd, MaybeAndThen, MaybeFilter, MaybeOr, MaybeXor}, Copied, Maybe, PureStaticMaybe, StaticMaybe};
 
@@ -9,18 +9,20 @@ use crate::{ops::{MaybeAnd, MaybeAndThen, MaybeFilter, MaybeOr, MaybeXor}, Copie
 /// 
 /// # Examples
 /// 
-/// TODO
+/// ```rust
+/// use option_trait::*;
+/// 
+/// let f = || ":^)";
+/// 
+/// let empty = OptCell::<&str, false>::from_fn(f);
+/// let full = OptCell::<&str, true>::from_fn(f);
+/// 
+/// assert!(empty.is_none());
+/// 
+/// assert!(full.is_some());
+/// assert_eq!(full.unwrap(), ":^)");
+/// ```
 pub struct OptCell<T, const IS_SOME: bool>(<T as private::_Spec<IS_SOME>>::Pure);
-
-/// An alias for an empty [OptCell](OptCell).
-/// 
-/// This is similar to [Option](core::option::Option), except wether or not it contains a value is determined at
-/// compile-time.
-/// 
-/// # Examples
-/// 
-/// TODO
-pub type EmptyCell<T> = OptCell<T, false>;
 
 impl<T> OptCell<T, false>
 {
@@ -31,7 +33,7 @@ impl<T> OptCell<T, false>
     /// ```rust
     /// use option_trait::*;
     /// 
-    /// let empty = EmptyCell::<i32>::none();
+    /// let empty = OptCell::<i32, false>::none();
     /// 
     /// assert!(empty.is_none());
     /// ```
@@ -330,7 +332,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// ```rust
     /// use option_trait::*;
     /// 
-    /// let empty = EmptyCell::<i32>::none();
+    /// let empty = OptCell::<i32, false>::none();
     /// let maybe = OptCell::some(777);
     /// 
     /// assert!(!empty.is_some());
@@ -349,7 +351,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// ```rust
     /// use option_trait::*;
     /// 
-    /// let empty = EmptyCell::<i32>::none();
+    /// let empty = OptCell::<i32, false>::none();
     /// let maybe = OptCell::some(777);
     /// 
     /// assert!(empty.is_none());
@@ -1134,17 +1136,17 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// ```rust
     /// use option_trait::*;
     /// 
-    /// let a = EmptyCell::<&'static str>::none();
-    /// let b = EmptyCell::<&'static str>::none();
+    /// let a = OptCell::<&'static str, false>::none();
+    /// let b = OptCell::<&'static str, false>::none();
     /// 
     /// assert_eq!(a.and(b), ());
     /// 
     /// let a = OptCell::some("First");
-    /// let b = EmptyCell::<&'static str>::none();
+    /// let b = OptCell::<&'static str, false>::none();
     /// 
     /// assert_eq!(a.and(b), ());
     /// 
-    /// let a = EmptyCell::<&'static str>::none();
+    /// let a = OptCell::<&'static str, false>::none();
     /// let b = OptCell::some("Second");
     /// 
     /// assert_eq!(a.and(b), ());
@@ -1216,17 +1218,17 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// ```rust
     /// use option_trait::*;
     /// 
-    /// let a = EmptyCell::<&'static str>::none();
-    /// let b = EmptyCell::<&'static str>::none();
+    /// let a = OptCell::<&'static str, false>::none();
+    /// let b = OptCell::<&'static str, false>::none();
     /// 
     /// assert_eq!(a.or(b), ());
     /// 
     /// let a = OptCell::some("First");
-    /// let b = EmptyCell::<&'static str>::none();
+    /// let b = OptCell::<&'static str, false>::none();
     /// 
     /// assert_eq!(a.or(b), "First");
     /// 
-    /// let a = EmptyCell::<&'static str>::none();
+    /// let a = OptCell::<&'static str, false>::none();
     /// let b = OptCell::some("Second");
     /// 
     /// assert_eq!(a.or(b), "Second");
@@ -1250,17 +1252,17 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// ```rust
     /// use option_trait::*;
     /// 
-    /// let a = EmptyCell::<&'static str>::none();
-    /// let b = EmptyCell::<&'static str>::none();
+    /// let a = OptCell::<&'static str, false>::none();
+    /// let b = OptCell::<&'static str, false>::none();
     /// 
     /// assert_eq!(a.or_else(|| b), ());
     /// 
     /// let a = OptCell::some("First");
-    /// let b = EmptyCell::<&'static str>::none();
+    /// let b = OptCell::<&'static str, false>::none();
     /// 
     /// assert_eq!(a.or_else(|| b), "First");
     /// 
-    /// let a = EmptyCell::<&'static str>::none();
+    /// let a = OptCell::<&'static str, false>::none();
     /// let b = OptCell::some("Second");
     /// 
     /// assert_eq!(a.or_else(|| b), "Second");
@@ -1283,17 +1285,17 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// ```rust
     /// use option_trait::*;
     /// 
-    /// let a = EmptyCell::<&'static str>::none();
-    /// let b = EmptyCell::<&'static str>::none();
+    /// let a = OptCell::<&'static str, false>::none();
+    /// let b = OptCell::<&'static str, false>::none();
     /// 
     /// assert_eq!(a.xor(b), ());
     /// 
     /// let a = OptCell::some("First");
-    /// let b = EmptyCell::<&'static str>::none();
+    /// let b = OptCell::<&'static str, false>::none();
     /// 
     /// assert_eq!(a.xor(b), "First");
     /// 
-    /// let a = EmptyCell::<&'static str>::none();
+    /// let a = OptCell::<&'static str, false>::none();
     /// let b = OptCell::some("Second");
     /// 
     /// assert_eq!(a.xor(b), "Second");
@@ -2057,7 +2059,7 @@ where
 
 mod private
 {
-    use crate::{NotVoid, PureStaticMaybe, StaticMaybe};
+    use crate::{PureStaticMaybe, StaticMaybe};
 
     use super::OptCell;
 
@@ -2122,13 +2124,13 @@ mod private
 #[cfg(test)]
 mod test
 {
-    use super::{EmptyCell, OptCell};
+    use super::OptCell;
 
     #[test]
     fn it_works()
     {
         let maybe = OptCell::some(777);
-        let empty = EmptyCell::none_like(&maybe);
+        let empty = OptCell::none_like(&maybe);
 
         println!("{:?}", maybe);
         println!("{:?}", empty);
