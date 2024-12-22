@@ -665,7 +665,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// 
     /// assert_eq!(empty.unwrap_or(666), 666);
     /// ```
-    pub fn unwrap_or(self, default: T) -> T
+    pub /*const*/ fn unwrap_or(self, default: T) -> T
     where
         T: Sized
     {
@@ -690,7 +690,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// 
     /// assert_eq!(empty.unwrap_ref_or(&666), &666);
     /// ```
-    pub fn unwrap_ref_or<'a>(&'a self, default: &'a T) -> &'a T
+    pub const fn unwrap_ref_or<'a>(&'a self, default: &'a T) -> &'a T
     where
         T: 'a
     {
@@ -715,7 +715,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// 
     /// assert_eq!(empty.unwrap_mut_or(&mut 666), &mut 666);
     /// ```
-    pub fn unwrap_mut_or<'a>(&'a mut self, default: &'a mut T) -> &'a mut T
+    pub const fn unwrap_mut_or<'a>(&'a mut self, default: &'a mut T) -> &'a mut T
     where
         T: 'a
     {
