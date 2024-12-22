@@ -58,7 +58,7 @@ where
 
     fn and_then<F>(self, and_then: F) -> Self::Output
     where
-        F: FnOnce(T) -> ()
+        F: FnOnce(T)
     {
         if let Some(x) = self
         {
@@ -125,7 +125,7 @@ where
     fn and_then<F>(self, and_then: F) -> Self::Output
     where
         T: Sized,
-        F: FnOnce(T) -> ()
+        F: FnOnce(T)
     {
         and_then(self)
     }

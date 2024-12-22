@@ -1,5 +1,6 @@
 #![cfg_attr(not(test), no_std)]
 #![allow(internal_features)]
+#![allow(clippy::type_complexity)]
 #![feature(const_trait_impl)]
 #![feature(auto_traits)]
 #![feature(negative_impls)]
