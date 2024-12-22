@@ -26,4 +26,4 @@ static_assertions = "1.1.0"
 [package.metadata.docs.rs]
 
 #all-features = true
-#no-default-features = true
+no-default-features = true
