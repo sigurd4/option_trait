@@ -1,6 +1,6 @@
 [package]
 name = "option_trait"
-version = "0.1.16"
+version = "1.0.0"
 edition = "2021"
 license = "MIT"
 keywords = ["option", "util", "ops", "trait"]
