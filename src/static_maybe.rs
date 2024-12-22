@@ -1,5 +1,6 @@
 use crate::{Maybe, NotVoid, PureStaticMaybe};
 
+/// A trait for [`Maybe`](crate::Maybe)-types that are compile-time managed.
 pub trait StaticMaybe<T>: Maybe<T>
 where
     T: ?Sized

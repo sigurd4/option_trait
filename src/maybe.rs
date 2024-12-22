@@ -2,95 +2,7 @@ use core::{ops::{Deref, DerefMut}, pin::Pin};
 
 use crate::{ops::{MaybeAnd, MaybeAndThen, MaybeFilter, MaybeOr, MaybeXor}, Copied, NotVoid, PureMaybe, StaticMaybe};
 
-#[cfg(test)]
-mod test
-{
-    use core::pin::Pin;
-
-    use crate::*;
-    use static_assertions::*;
-
-    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::Pure, Option<i32>);
-    assert_type_eq_all!(<i32 as Maybe<i32>>::Pure, i32);
-    assert_type_eq_all!(<() as Maybe<i32>>::Pure, ());
-    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::Pure, i32);
-    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::Pure, ());
-
-    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::PureRef<'static>, Option<&i32>);
-    assert_type_eq_all!(<i32 as Maybe<i32>>::PureRef<'static>, &i32);
-    assert_type_eq_all!(<() as Maybe<i32>>::PureRef<'static>, ());
-    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::PureRef<'static>, &i32);
-    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::PureRef<'static>, ());
-
-    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::PureMut<'static>, Option<&mut i32>);
-    assert_type_eq_all!(<i32 as Maybe<i32>>::PureMut<'static>, &mut i32);
-    assert_type_eq_all!(<() as Maybe<i32>>::PureMut<'static>, ());
-    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::PureMut<'static>, &mut i32);
-    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::PureMut<'static>, ());
-
-    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::PurePinRef<'static>, Option<Pin<&i32>>);
-    assert_type_eq_all!(<i32 as Maybe<i32>>::PurePinRef<'static>, Pin<&i32>);
-    assert_type_eq_all!(<() as Maybe<i32>>::PurePinRef<'static>, ());
-    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::PurePinRef<'static>, Pin<&i32>);
-    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::PurePinRef<'static>, ());
-
-    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::PurePinMut<'static>, Option<Pin<&mut i32>>);
-    assert_type_eq_all!(<i32 as Maybe<i32>>::PurePinMut<'static>, Pin<&mut i32>);
-    assert_type_eq_all!(<() as Maybe<i32>>::PurePinMut<'static>, ());
-    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::PurePinMut<'static>, Pin<&mut i32>);
-    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::PurePinMut<'static>, ());
-
-    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::Mapped<u64>, Option<u64>);
-    assert_type_eq_all!(<i32 as Maybe<i32>>::Mapped<u64>, u64);
-    assert_type_eq_all!(<() as Maybe<i32>>::Mapped<u64>, ());
-    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::Mapped<u64>, [u64; 1]);
-    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::Mapped<u64>, [u64; 0]);
-
-    assert_type_eq_all!(<Option<&i32> as Maybe<&i32>>::Copied, Option<i32>);
-    assert_type_eq_all!(<&i32 as Maybe<&i32>>::Copied, i32);
-    assert_type_eq_all!(<() as Maybe<&i32>>::Copied, ());
-    assert_type_eq_all!(<[&i32; 1] as Maybe<&i32>>::Copied, [i32; 1]);
-    assert_type_eq_all!(<[&i32; 0] as Maybe<&i32>>::Copied, [i32; 0]);
-    
-    // This is supposed to work, but the compiler gets confused...
-    // Wait for specialization to be a stable feature.
-    /*assert_type_eq_all!(<Option<i32> as Maybe<i32>>::Copied, Option<i32>);
-    assert_type_eq_all!(<i32 as Maybe<i32>>::Copied, i32);
-    assert_type_eq_all!(<() as Maybe<i32>>::Copied, ());
-    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::Copied, [i32; 1]);
-    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::Copied, [i32; 0]);*/
-    
-    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::AsRef<'static>, Option<&i32>);
-    assert_type_eq_all!(<i32 as Maybe<i32>>::AsRef<'static>, &i32);
-    assert_type_eq_all!(<() as Maybe<i32>>::AsRef<'static>, ());
-    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::AsRef<'static>, [&i32; 1]);
-    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::AsRef<'static>, [&i32; 0]);
-
-    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::AsMut<'static>, Option<&mut i32>);
-    assert_type_eq_all!(<i32 as Maybe<i32>>::AsMut<'static>, &mut i32);
-    assert_type_eq_all!(<() as Maybe<i32>>::AsMut<'static>, ());
-    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::AsMut<'static>, [&mut i32; 1]);
-    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::AsMut<'static>, [&mut i32; 0]);
-
-    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::AsPinRef<'static>, Option<Pin<&i32>>);
-    assert_type_eq_all!(<i32 as Maybe<i32>>::AsPinRef<'static>, Pin<&i32>);
-    assert_type_eq_all!(<() as Maybe<i32>>::AsPinRef<'static>, ());
-    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::AsPinRef<'static>, [Pin<&i32>; 1]);
-    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::AsPinRef<'static>, [Pin<&i32>; 0]);
-
-    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::AsPinMut<'static>, Option<Pin<&mut i32>>);
-    assert_type_eq_all!(<i32 as Maybe<i32>>::AsPinMut<'static>, Pin<&mut i32>);
-    assert_type_eq_all!(<() as Maybe<i32>>::AsPinMut<'static>, ());
-    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::AsPinMut<'static>, [Pin<&mut i32>; 1]);
-    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::AsPinMut<'static>, [Pin<&mut i32>; 0]);
-
-    assert_type_eq_all!(<Option<Box<i32>> as Maybe<Box<i32>>>::AsDeref<'static>, Option<&i32>);
-    assert_type_eq_all!(<Box<i32> as Maybe<Box<i32>>>::AsDeref<'static>, &i32);
-    assert_type_eq_all!(<() as Maybe<Box<i32>>>::AsDeref<'static>, ());
-    assert_type_eq_all!(<[Box<i32>; 1] as Maybe<Box<i32>>>::AsDeref<'static>, [&i32; 1]);
-    assert_type_eq_all!(<[Box<i32>; 0] as Maybe<Box<i32>>>::AsDeref<'static>, [&i32; 0]);
-}
-
+/// A trait for maybe-types like [`Option`](core::option::Option), as well as compile-time managed [`Maybe`]-types
 pub trait Maybe<T>
 where
     T: ?Sized
@@ -2957,4 +2869,93 @@ impl<T> /*const*/ Maybe<T> for [T; 1]
             self.map_unchecked_mut(|this| &mut this[0])
         }
     }
+}
+
+#[cfg(test)]
+mod test
+{
+    use core::pin::Pin;
+
+    use crate::*;
+    use static_assertions::*;
+
+    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::Pure, Option<i32>);
+    assert_type_eq_all!(<i32 as Maybe<i32>>::Pure, i32);
+    assert_type_eq_all!(<() as Maybe<i32>>::Pure, ());
+    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::Pure, i32);
+    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::Pure, ());
+
+    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::PureRef<'static>, Option<&i32>);
+    assert_type_eq_all!(<i32 as Maybe<i32>>::PureRef<'static>, &i32);
+    assert_type_eq_all!(<() as Maybe<i32>>::PureRef<'static>, ());
+    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::PureRef<'static>, &i32);
+    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::PureRef<'static>, ());
+
+    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::PureMut<'static>, Option<&mut i32>);
+    assert_type_eq_all!(<i32 as Maybe<i32>>::PureMut<'static>, &mut i32);
+    assert_type_eq_all!(<() as Maybe<i32>>::PureMut<'static>, ());
+    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::PureMut<'static>, &mut i32);
+    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::PureMut<'static>, ());
+
+    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::PurePinRef<'static>, Option<Pin<&i32>>);
+    assert_type_eq_all!(<i32 as Maybe<i32>>::PurePinRef<'static>, Pin<&i32>);
+    assert_type_eq_all!(<() as Maybe<i32>>::PurePinRef<'static>, ());
+    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::PurePinRef<'static>, Pin<&i32>);
+    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::PurePinRef<'static>, ());
+
+    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::PurePinMut<'static>, Option<Pin<&mut i32>>);
+    assert_type_eq_all!(<i32 as Maybe<i32>>::PurePinMut<'static>, Pin<&mut i32>);
+    assert_type_eq_all!(<() as Maybe<i32>>::PurePinMut<'static>, ());
+    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::PurePinMut<'static>, Pin<&mut i32>);
+    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::PurePinMut<'static>, ());
+
+    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::Mapped<u64>, Option<u64>);
+    assert_type_eq_all!(<i32 as Maybe<i32>>::Mapped<u64>, u64);
+    assert_type_eq_all!(<() as Maybe<i32>>::Mapped<u64>, ());
+    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::Mapped<u64>, [u64; 1]);
+    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::Mapped<u64>, [u64; 0]);
+
+    assert_type_eq_all!(<Option<&i32> as Maybe<&i32>>::Copied, Option<i32>);
+    assert_type_eq_all!(<&i32 as Maybe<&i32>>::Copied, i32);
+    assert_type_eq_all!(<() as Maybe<&i32>>::Copied, ());
+    assert_type_eq_all!(<[&i32; 1] as Maybe<&i32>>::Copied, [i32; 1]);
+    assert_type_eq_all!(<[&i32; 0] as Maybe<&i32>>::Copied, [i32; 0]);
+    
+    // This is supposed to work, but the compiler gets confused...
+    // Wait for specialization to be a stable feature.
+    /*assert_type_eq_all!(<Option<i32> as Maybe<i32>>::Copied, Option<i32>);
+    assert_type_eq_all!(<i32 as Maybe<i32>>::Copied, i32);
+    assert_type_eq_all!(<() as Maybe<i32>>::Copied, ());
+    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::Copied, [i32; 1]);
+    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::Copied, [i32; 0]);*/
+    
+    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::AsRef<'static>, Option<&i32>);
+    assert_type_eq_all!(<i32 as Maybe<i32>>::AsRef<'static>, &i32);
+    assert_type_eq_all!(<() as Maybe<i32>>::AsRef<'static>, ());
+    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::AsRef<'static>, [&i32; 1]);
+    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::AsRef<'static>, [&i32; 0]);
+
+    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::AsMut<'static>, Option<&mut i32>);
+    assert_type_eq_all!(<i32 as Maybe<i32>>::AsMut<'static>, &mut i32);
+    assert_type_eq_all!(<() as Maybe<i32>>::AsMut<'static>, ());
+    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::AsMut<'static>, [&mut i32; 1]);
+    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::AsMut<'static>, [&mut i32; 0]);
+
+    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::AsPinRef<'static>, Option<Pin<&i32>>);
+    assert_type_eq_all!(<i32 as Maybe<i32>>::AsPinRef<'static>, Pin<&i32>);
+    assert_type_eq_all!(<() as Maybe<i32>>::AsPinRef<'static>, ());
+    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::AsPinRef<'static>, [Pin<&i32>; 1]);
+    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::AsPinRef<'static>, [Pin<&i32>; 0]);
+
+    assert_type_eq_all!(<Option<i32> as Maybe<i32>>::AsPinMut<'static>, Option<Pin<&mut i32>>);
+    assert_type_eq_all!(<i32 as Maybe<i32>>::AsPinMut<'static>, Pin<&mut i32>);
+    assert_type_eq_all!(<() as Maybe<i32>>::AsPinMut<'static>, ());
+    assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::AsPinMut<'static>, [Pin<&mut i32>; 1]);
+    assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::AsPinMut<'static>, [Pin<&mut i32>; 0]);
+
+    assert_type_eq_all!(<Option<Box<i32>> as Maybe<Box<i32>>>::AsDeref<'static>, Option<&i32>);
+    assert_type_eq_all!(<Box<i32> as Maybe<Box<i32>>>::AsDeref<'static>, &i32);
+    assert_type_eq_all!(<() as Maybe<Box<i32>>>::AsDeref<'static>, ());
+    assert_type_eq_all!(<[Box<i32>; 1] as Maybe<Box<i32>>>::AsDeref<'static>, [&i32; 1]);
+    assert_type_eq_all!(<[Box<i32>; 0] as Maybe<Box<i32>>>::AsDeref<'static>, [&i32; 0]);
 }
