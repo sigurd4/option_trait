@@ -1022,8 +1022,6 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// ```rust
     /// use option_trait::*;
     /// 
-    /// use option_trait::*;
-    /// 
     /// let maybe = OptCell::some("All right");
     /// let empty = OptCell::none_like(&maybe);
     /// 
@@ -1049,8 +1047,6 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// # Examples
     /// 
     /// ```rust
-    /// use option_trait::*;
-    /// 
     /// use option_trait::*;
     /// 
     /// let maybe = OptCell::some("All right");
