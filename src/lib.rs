@@ -199,7 +199,7 @@ mod test
     {
         use option_trait::*;
         use static_assertions::*;
-        
+
         assert_type_eq_all!(<Option<&i32> as Maybe<&i32>>::Copied, Option<i32>);
         assert_type_eq_all!(<&i32 as Maybe<&i32>>::Copied, i32);
         assert_type_eq_all!(<() as Maybe<&i32>>::Copied, ());
@@ -212,10 +212,10 @@ mod test
         assert_type_eq_all!(<() as Maybe<i32>>::Copied, ());
         assert_type_eq_all!(<[i32; 1] as Maybe<i32>>::Copied, [i32; 1]);
         assert_type_eq_all!(<[i32; 0] as Maybe<i32>>::Copied, [i32; 0]);*/
-        
+
         let maybe = [777];
         let referenced = Maybe::<i32>::as_ref(&maybe);
-        
+
         // This is supposed to work...
         //let copy1 = Maybe::<i32>::copied(&maybe);
         //assert_eq!(copy1, [777]);
