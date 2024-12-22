@@ -107,7 +107,7 @@ where
     /// 
     /// let maybe = ["turnip"];
     /// 
-    /// let value = StaticMaybe::<&str>::as_value_ref(&maybe);
+    /// let value = StaticMaybe::<&str>::as_value(&maybe);
     /// 
     /// assert_eq!(value, &"turnip");
     /// ```
@@ -125,7 +125,7 @@ where
     /// ```rust
     /// use option_trait::*;
     /// 
-    /// let maybe = ["turnip"];
+    /// let mut maybe = ["turnip"];
     /// 
     /// let value = StaticMaybe::<&str>::as_value_mut(&mut maybe);
     /// 

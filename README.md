@@ -15,3 +15,49 @@
 # option_trait
 
 Provides the `Optional` trait for `Option`s, as well as compile-time managed `Option` alternatives, all generalized under the trait `Maybe`.
+
+`Maybe<T>` is implemented for:
+- `Option<T>`
+    - Run-time managed
+    - Also implements `Optional` and `PureMaybe`
+- `T` and `()`
+    - Compile-time managed
+    - Also implements `PureStaticMaybe`, `PureMaybe` and `StaticMaybe`
+- `[T; 1]` and `[T; 0]`
+    - Compile-time managed
+    - Can be managed using constant expressions, but with some difficulty
+    - Also implements `StaticMaybe`
+- `OptCell<T, _>` (`feature = "opt_cell"`)
+    - Compile-time managed
+    - Can be more easily managed using boolean constant expressions
+    - Has const methods
+    - Also implements `StaticMaybe`
+
+## Examples
+
+This is how i like to handle optional function arguments with maximum flexibility.
+
+```rust
+use option_trait::*;
+
+fn f<O>(required: i32, optional: O)
+where
+    O: Maybe<i32>
+{
+    if O::IS_MAYBE_SOME
+    {
+        // This part of the code will be disabled at compile-time if the maybe cannot possibly contain a value.
+    }
+
+    // Do whatever
+}
+
+f(1, 2);
+f(1, ());
+f(1, Some(2));
+f(1, None);
+f(1, [2]);
+f(1, [] as [i32; 0]);
+f(1, OptCell::some(2));
+f(1, OptCell::none());
+```

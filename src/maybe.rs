@@ -7,6 +7,13 @@ pub trait Maybe<T>
 where
     T: ?Sized
 {
+    const IS_MAYBE_SOME: bool;
+    const IS_MAYBE_NONE: bool;
+    const IS_NEVER_SOME: bool = !Self::IS_MAYBE_SOME;
+    const IS_NEVER_NONE: bool = !Self::IS_MAYBE_NONE;
+    const IS_ALWAYS_SOME: bool = Self::IS_MAYBE_SOME && !Self::IS_MAYBE_NONE;
+    const IS_ALWAYS_NONE: bool = Self::IS_MAYBE_NONE && !Self::IS_MAYBE_SOME;
+
     /// Either `T`, `()` or an [`Option`](core::option::Option) containing `T`.
     /// 
     /// This is an option if the maybe is run-time managed, otherwise it's the inner type or void if compile-time managed.
@@ -1345,6 +1352,9 @@ impl<T> /*const*/ Maybe<T> for T
 where
     T: ?Sized
 {
+    const IS_MAYBE_SOME: bool = true;
+    const IS_MAYBE_NONE: bool = false;
+
     type Pure = T
     where
         T: StaticMaybe<T>,
@@ -1652,6 +1662,9 @@ impl<T> /*const*/ Maybe<T> for ()
 where
     T: NotVoid + ?Sized
 {
+    const IS_MAYBE_SOME: bool = false;
+    const IS_MAYBE_NONE: bool = true;
+
     type Pure = ();
     type PureRef<'a> = <Self::AsRef<'a> as Maybe<&'a T>>::Pure
     where
@@ -1946,6 +1959,9 @@ where
 }
 impl<T> /*const*/ Maybe<T> for Option<T>
 {
+    const IS_MAYBE_SOME: bool = true;
+    const IS_MAYBE_NONE: bool = true;
+
     type Pure = Option<T>
     where
         T: StaticMaybe<T>,
@@ -2246,6 +2262,9 @@ impl<T> /*const*/ Maybe<T> for Option<T>
 }
 impl<T> /*const*/ Maybe<T> for [T; 0]
 {
+    const IS_MAYBE_SOME: bool = false;
+    const IS_MAYBE_NONE: bool = true;
+
     type Pure = <() as Maybe<T>>::Pure
     where
         T: StaticMaybe<T>,
@@ -2547,6 +2566,9 @@ impl<T> /*const*/ Maybe<T> for [T; 0]
 }
 impl<T> /*const*/ Maybe<T> for [T; 1]
 {
+    const IS_MAYBE_SOME: bool = true;
+    const IS_MAYBE_NONE: bool = false;
+    
     type Pure = T
     where
         T: StaticMaybe<T>,

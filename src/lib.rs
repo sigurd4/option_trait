@@ -19,8 +19,54 @@
 #![feature(specialization)]
 #![feature(generic_const_exprs)]
 
-//! Provides the [Optional](Optional) trait for [Option](core::option::Option)s, as well as compile-time managed [Option](core::option::Option) alternatives,
-//! all generalized under the trait [Maybe](Maybe).
+//! Provides the [`Optional`](Optional) trait for [`Option`](core::option::Option)s, as well as compile-time managed [`Option`](core::option::Option) alternatives,
+//! all generalized under the trait [`Maybe`](Maybe).
+//! 
+//! [`Maybe<T>`](Maybe) is implemented for:
+//! - [`Option<T>`](core::option::Option)
+//!     - Run-time managed
+//!     - Also implements [`Optional`](Optional) and [`PureMaybe`](PureMaybe)
+//! - `T` and `()`
+//!     - Compile-time managed
+//!     - Also implements [`PureStaticMaybe`](PureStaticMaybe), [`PureMaybe`](PureMaybe) and [`StaticMaybe`](StaticMaybe)
+//! - `[T; 1]` and `[T; 0]`
+//!     - Compile-time managed
+//!     - Can be managed using constant expressions, but with some difficulty
+//!     - Also implements [`StaticMaybe`](StaticMaybe)
+//! - [`OptCell<T, _>`](OptCell) (`feature = "opt_cell"`)
+//!     - Compile-time managed
+//!     - Can be more easily managed using boolean constant expressions
+//!     - Has const methods
+//!     - Also implements [`StaticMaybe`](StaticMaybe)
+//! 
+//! # Examples
+//! 
+//! This is how i like to handle optional function arguments with maximum flexibility.
+//! 
+//! ```rust
+//! use option_trait::*;
+//! 
+//! fn f<O>(required: i32, optional: O)
+//! where
+//!     O: Maybe<i32>
+//! {
+//!     if O::IS_MAYBE_SOME
+//!     {
+//!         // This part of the code will be disabled at compile-time if the maybe cannot possibly contain a value.
+//!     }
+//! 
+//!     // Do whatever
+//! }
+//! 
+//! f(1, 2);
+//! f(1, ());
+//! f(1, Some(2));
+//! f(1, None);
+//! f(1, [2]);
+//! f(1, [] as [i32; 0]);
+//! f(1, OptCell::some(2));
+//! f(1, OptCell::none());
+//! ```
 
 moddef::moddef!(
     pub mod {
@@ -30,20 +76,21 @@ moddef::moddef!(
         optional,
         maybe,
         pure_maybe,
+        static_maybe,
         pure_static_maybe,
-        not_void,
-        static_maybe
+        opt_cell for cfg(feature = "opt_cell"),
+        not_void
     }
 );
 
 #[allow(unused)]
 use crate as option_trait;
 
-/*const unsafe fn transmute_same_size<T, U>(value: T) -> U
+const unsafe fn transmute_same_size<T, U>(value: T) -> U
 {
     assert!(core::mem::size_of::<T>() == core::mem::size_of::<U>());
     unsafe { core::intrinsics::transmute_unchecked::<T, U>(value) }
-}*/
+}
 /*const unsafe fn transmute_same_size_ref<T, U>(value: &T) -> &U
 {
     assert!(core::mem::size_of::<T>() == core::mem::size_of::<U>());
@@ -74,11 +121,11 @@ const fn assume_same_ref<T, U>(value: &T) -> &U
     assert!(is_same_type::<T, U>());
     unsafe { core::intrinsics::transmute::<&T, &U>(value) }
 }
-/*const fn assume_same_mut<T, U>(value: &mut T) -> &mut U
+const fn assume_same_mut<T, U>(value: &mut T) -> &mut U
 {
     assert!(is_same_type::<T, U>());
     unsafe { core::intrinsics::transmute::<&mut T, &mut U>(value) }
-}*/
+}
 const fn copy_ref<T>(src: &T) -> Copied<T>
 where
     <T as private::_Copied>::Copied: Copy
