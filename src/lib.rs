@@ -4,18 +4,13 @@
 #![feature(const_trait_impl)]
 #![feature(auto_traits)]
 #![feature(negative_impls)]
-#![feature(maybe_uninit_uninit_array)]
-#![feature(maybe_uninit_array_assume_init)]
 #![feature(try_trait_v2_yeet)]
 #![feature(unboxed_closures)]
 #![feature(associated_type_defaults)]
-#![feature(const_destruct)]
-#![feature(adt_const_params)]
 #![feature(associated_const_equality)]
 #![feature(structural_match)]
 #![feature(core_intrinsics)]
 #![feature(const_eval_select)]
-#![feature(never_type)]
 #![feature(specialization)]
 #![feature(generic_const_exprs)]
 
@@ -85,9 +80,6 @@ moddef::moddef!(
         not_void
     }
 );
-
-#[allow(unused)]
-use crate as option_trait;
 
 #[allow(unused)]
 const unsafe fn transmute_same_size<T, U>(value: T) -> U
@@ -196,19 +188,6 @@ mod private
     pub trait Same<T> {}
     impl<T, U> Same<T> for U where T: MaybeSame<T, IS_SAME = true> {}
 
-    pub trait _Ref
-    {
-        type Target;
-    }
-    impl<T> _Ref for &T
-    {
-        type Target = T;
-    }
-    impl<T> _Ref for &mut T
-    {
-        type Target = T;
-    }
-
     pub trait _Copied
     {
         type Copied;
@@ -217,11 +196,13 @@ mod private
     {
         default type Copied = T;
     }
-    impl<T> _Copied for T
-    where
-        T: _Ref
+    impl<T> _Copied for &T
     {
-        type Copied = <T as _Ref>::Target;
+        type Copied = T;
+    }
+    impl<T> _Copied for &mut T
+    {
+        type Copied = T;
     }
 
     use crate::NotVoid;
@@ -244,7 +225,7 @@ mod test
 {
     use static_assertions::assert_type_eq_all;
 
-    use crate::option_trait;
+    use crate as option_trait;
     use option_trait::*;
 
     assert_type_eq_all!(<&i32 as private::_Copied>::Copied, i32);
