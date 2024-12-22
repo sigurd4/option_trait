@@ -46,7 +46,8 @@ where
 {
     if O::IS_MAYBE_SOME
     {
-        // This part of the code will be disabled at compile-time if the maybe cannot possibly contain a value.
+        // This part of the code will be disabled at compile-time if the maybe cannot
+        // possibly contain a value.
     }
 
     // Do whatever

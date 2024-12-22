@@ -33,7 +33,7 @@
 //!     - Compile-time managed
 //!     - Can be managed using constant expressions, but with some difficulty
 //!     - Also implements [`StaticMaybe`](StaticMaybe)
-//! - [`OptCell<T, _>`](OptCell) (only if feature "opt_cell" is enabled)
+//! - [`OptCell<T, _>`](OptCell) (only if feature `opt_cell` is enabled)
 //!     - Compile-time managed
 //!     - Can be more easily managed using boolean constant expressions
 //!     - Has const methods
@@ -52,7 +52,8 @@
 //! {
 //!     if O::IS_MAYBE_SOME
 //!     {
-//!         // This part of the code will be disabled at compile-time if the maybe cannot possibly contain a value.
+//!         // This part of the code will be disabled at compile-time if the maybe cannot
+//!         // possibly contain a value.
 //!     }
 //!
 //!     // Do whatever
