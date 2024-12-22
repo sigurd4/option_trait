@@ -5,20 +5,26 @@ pub trait StaticMaybe<T>: Maybe<T>
 where
     T: ?Sized
 {
-
+    /// Equals `true` if the [`Maybe`](crate::Maybe)-type contains a value.
     const IS_SOME: bool;
+    /// Equals `true` if the [`Maybe`](crate::Maybe)-type does not contain a value.
     const IS_NONE: bool;
+    /// This kind of maybe if it contained a value.
     type Some: StaticMaybe<T> + ?Sized;
+    /// This kind of maybe if it didn't contain a value.
     type None: StaticMaybe<T>
     where
         (): StaticMaybe<T>;
+    /// This kind of maybe which is full if this one is empty, or empty if this one is full.
     type Opposite: StaticMaybe<T> + ?Sized
     where
         (): StaticMaybe<T>;
+    /// `M` if this contains a value, otherwise `()`.
     type Maybe<M>: PureStaticMaybe<M> + ?Sized
     where
         M: ?Sized,
         (): PureStaticMaybe<M>;
+    /// `M` if this contains a value, otherwise `O`.
     type MaybeOr<M, O>: ?Sized
     where
         M: ?Sized,
@@ -86,11 +92,51 @@ where
     fn into_value(self) -> T
     where
         Self: StaticMaybe<T, Maybe<T> = T>,
-        T: Sized,
         (): PureStaticMaybe<T>,
+        T: Sized,
         Self: Sized
     {
         self.unwrap()
+    }
+    /// Unwraps the maybe into its inner value by reference. This one won't panic, as opposed to [`Maybe::unwrap_ref()`](crate::Maybe::unwrap_ref).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = ["turnip"];
+    /// 
+    /// let value = StaticMaybe::<&str>::as_value_ref(&maybe);
+    /// 
+    /// assert_eq!(value, &"turnip");
+    /// ```
+    fn as_value(&self) -> &T
+    where
+        Self: StaticMaybe<T, Maybe<T> = T>,
+        (): PureStaticMaybe<T>
+    {
+        self.unwrap_ref()
+    }
+    /// Unwraps the maybe into its inner value by mutable reference. This one won't panic, as opposed to [`Maybe::unwrap_mut()`](crate::Maybe::unwrap_mut).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = ["turnip"];
+    /// 
+    /// let value = StaticMaybe::<&str>::as_value_mut(&mut maybe);
+    /// 
+    /// assert_eq!(value, &"turnip");
+    /// ```
+    fn as_value_mut(&mut self) -> &mut T
+    where
+        Self: StaticMaybe<T, Maybe<T> = T>,
+        (): PureStaticMaybe<T>
+    {
+        self.unwrap_mut()
     }
 }
 impl<Some> /*const*/ StaticMaybe<Some> for Some
