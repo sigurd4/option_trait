@@ -1,6 +1,6 @@
 use core::{ops::{Deref, DerefMut}, pin::Pin};
 
-use crate::{ops::{MaybeAnd, MaybeAndThen, MaybeFilter, MaybeOr, MaybeXor}, private, Copied, NotVoid, PureMaybe, StaticMaybe};
+use crate::{ops::{MaybeAnd, MaybeAndThen, MaybeFilter, MaybeOr, MaybeXor}, Copied, NotVoid, PureMaybe, StaticMaybe};
 
 #[cfg(test)]
 mod test

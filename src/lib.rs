@@ -37,13 +37,14 @@ moddef::moddef!(
     }
 );
 
+#[allow(unused)]
 use crate as option_trait;
 
-const unsafe fn transmute_same_size<T, U>(value: T) -> U
+/*const unsafe fn transmute_same_size<T, U>(value: T) -> U
 {
     assert!(core::mem::size_of::<T>() == core::mem::size_of::<U>());
     unsafe { core::intrinsics::transmute_unchecked::<T, U>(value) }
-}
+}*/
 /*const unsafe fn transmute_same_size_ref<T, U>(value: &T) -> &U
 {
     assert!(core::mem::size_of::<T>() == core::mem::size_of::<U>());
@@ -74,11 +75,11 @@ const fn assume_same_ref<T, U>(value: &T) -> &U
     assert!(is_same_type::<T, U>());
     unsafe { core::intrinsics::transmute::<&T, &U>(value) }
 }
-const fn assume_same_mut<T, U>(value: &mut T) -> &mut U
+/*const fn assume_same_mut<T, U>(value: &mut T) -> &mut U
 {
     assert!(is_same_type::<T, U>());
     unsafe { core::intrinsics::transmute::<&mut T, &mut U>(value) }
-}
+}*/
 const fn copy_ref<T>(src: &T) -> Copied<T>
 where
     <T as private::_Copied>::Copied: Copy
