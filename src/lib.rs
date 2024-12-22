@@ -127,27 +127,29 @@ const fn assume_same_mut<T, U>(value: &mut T) -> &mut U
     assert!(is_same_type::<T, U>());
     unsafe { core::intrinsics::transmute::<&mut T, &mut U>(value) }
 }
-const fn copy_ref<T>(src: &T) -> Copied<T>
+const fn copy_ref<T>(src: &T) -> <T as Copied>::Output
 where
-    <T as private::_Copied>::Copied: Copy
+    T: Copied,
+    <T as Copied>::Output: Copy
 {
-    if is_same_type::<T, Copied<T>>()
+    if is_same_type::<T, <T as Copied>::Output>()
     {
-        return *assume_same_ref::<T, Copied<T>>(src);
+        return *assume_same_ref::<T, <T as Copied>::Output>(src);
     }
-    assert!(is_same_type::<T, &Copied<T>>() || is_same_type::<T, &mut Copied<T>>());
-    unsafe { **core::intrinsics::transmute::<&T, &&Copied<T>>(src) }
+    assert!(is_same_type::<T, &<T as Copied>::Output>() || is_same_type::<T, &mut <T as Copied>::Output>());
+    unsafe { **core::intrinsics::transmute::<&T, &&<T as Copied>::Output>(src) }
 }
-fn clone_ref<T>(src: &T) -> Copied<T>
+fn clone_ref<T>(src: &T) -> <T as Copied>::Output
 where
-    Copied<T>: Clone
+    T: Copied,
+    <T as Copied>::Output: Clone
 {
-    if is_same_type::<T, Copied<T>>()
+    if is_same_type::<T, <T as Copied>::Output>()
     {
-        return assume_same_ref::<T, Copied<T>>(src).clone();
+        return assume_same_ref::<T, <T as Copied>::Output>(src).clone();
     }
-    assert!(is_same_type::<T, &Copied<T>>() || is_same_type::<T, &mut Copied<T>>());
-    unsafe { (*core::intrinsics::transmute::<&T, &&Copied<T>>(src)).clone() }
+    assert!(is_same_type::<T, &<T as Copied>::Output>() || is_same_type::<T, &mut <T as Copied>::Output>());
+    unsafe { (*core::intrinsics::transmute::<&T, &&<T as Copied>::Output>(src)).clone() }
 }
 const fn on_unwrap_empty() -> !
 {
@@ -161,7 +163,16 @@ const fn on_unwrap_empty_msg(msg: &str) -> !
 pub trait Same<T>: private::Same<T> {}
 impl<T, U> Same<T> for U where U: private::Same<T> {}
 
-pub type Copied<T> = <T as private::_Copied>::Copied;
+pub trait Copied: private::_Copied
+{
+    type Output;
+}
+impl<T> Copied for T
+where
+    T: private::_Copied
+{
+    type Output = <T as private::_Copied>::Output;
+}
 
 mod private
 {
@@ -188,21 +199,21 @@ mod private
     pub trait Same<T> {}
     impl<T, U> Same<T> for U where T: MaybeSame<T, IS_SAME = true> {}
 
-    pub trait _Copied
+    pub trait _Copied: Sized
     {
-        type Copied;
+        type Output;
     }
-    impl<T> _Copied for T
+    /*impl<T> _Copied for T
     {
-        default type Copied = T;
-    }
+        default type Output = T;
+    }*/
     impl<T> _Copied for &T
     {
-        type Copied = T;
+        type Output = T;
     }
     impl<T> _Copied for &mut T
     {
-        type Copied = T;
+        type Output = T;
     }
 
     use crate::NotVoid;
@@ -228,8 +239,8 @@ mod test
     use crate as option_trait;
     use option_trait::*;
 
-    assert_type_eq_all!(<&i32 as private::_Copied>::Copied, i32);
-    //assert_type_eq_all!(<i32 as private::_Copied>::Copied, i32);
+    assert_type_eq_all!(<&i32 as Copied>::Output, i32);
+    //assert_type_eq_all!(<i32 as Copied>::Output, i32);
 
     #[test]
     fn it_works()

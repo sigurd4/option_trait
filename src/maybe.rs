@@ -198,10 +198,10 @@ where
     /// let copy2 = Maybe::<&i32>::copied(&referenced);
     /// assert_eq!(copy2, [777]);
     /// ```
-    type Copied: Maybe<Copied<T>>
+    type Copied: Maybe<<T as Copied>::Output>
     where
-        T: Sized,
-        (): StaticMaybe<Copied<T>>;
+        T: Copied,
+        (): StaticMaybe<<T as Copied>::Output>;
     
     /// The same kind of maybe, but with its internal value mutably borrowed.
     /// 
@@ -1140,9 +1140,8 @@ where
     /// ```
     fn copied(&self) -> Self::Copied
     where
-        Copied<T>: Copy,
-        T: Sized,
-        (): StaticMaybe<Copied<T>>;
+        T: Copied<Output: Copy>,
+        (): StaticMaybe<<T as Copied>::Output>;
     /// Clones the internal value, if it exists, and returns it in a new maybe.
     /// 
     /// # Examples
@@ -1158,9 +1157,9 @@ where
     /// ```
     fn cloned(&self) -> Self::Copied
     where
-        Copied<T>: Clone,
+        T: Copied<Output: Clone>,
         T: Sized,
-        (): StaticMaybe<Copied<T>>;
+        (): StaticMaybe<<T as Copied>::Output>;
 
     /// Converts this maybe into an [`Option`](core::option::Option).
     /// 
@@ -1380,10 +1379,10 @@ where
     where
         U: StaticMaybe<U>,
         (): StaticMaybe<U>;
-    type Copied = Self::Mapped<Copied<T>>
+    type Copied = Self::Mapped<<T as Copied>::Output>
     where
-        T: Sized,
-        (): StaticMaybe<Copied<T>>;
+        T: Copied,
+        (): StaticMaybe<<T as Copied>::Output>;
 
     fn is_some(&self) -> bool
     {
@@ -1587,17 +1586,16 @@ where
     }
     fn copied(&self) -> Self::Copied
     where
-        Copied<T>: Copy,
-        T: Sized,
-        (): StaticMaybe<Copied<T>>
+        T: Copied<Output: Copy>,
+        (): StaticMaybe<<T as Copied>::Output>
     {
         crate::copy_ref(self)
     }
     fn cloned(&self) -> Self::Copied
     where
-        Copied<T>: Clone,
+        T: Copied<Output: Clone>,
         T: Sized,
-        (): StaticMaybe<Copied<T>>
+        (): StaticMaybe<<T as Copied>::Output>
     {
         crate::clone_ref(self)
     }
@@ -1687,10 +1685,10 @@ where
     where
         U: StaticMaybe<U>,
         (): StaticMaybe<U>;
-    type Copied = Self::Mapped<Copied<T>>
+    type Copied = Self::Mapped<<T as Copied>::Output>
     where
-        T: Sized,
-        (): StaticMaybe<Copied<T>>;
+        T: Copied,
+        (): StaticMaybe<<T as Copied>::Output>;
 
     fn is_some(&self) -> bool
     {
@@ -1890,17 +1888,15 @@ where
     }
     fn copied(&self) -> Self::Copied
     where
-        Copied<T>: Copy,
-        T: Sized,
-        (): StaticMaybe<Copied<T>>
+        T: Copied<Output: Copy>,
+        (): StaticMaybe<<T as Copied>::Output>
     {
         
     }
     fn cloned(&self) -> Self::Copied
     where
-        Copied<T>: Clone,
-        T: Sized,
-        (): StaticMaybe<Copied<T>>
+        T: Copied<Output: Clone>,
+        (): StaticMaybe<<T as Copied>::Output>
     {
         
     }
@@ -1987,10 +1983,10 @@ impl<T> /*const*/ Maybe<T> for Option<T>
     where
         U: StaticMaybe<U>,
         (): StaticMaybe<U>;
-    type Copied = Self::Mapped<Copied<T>>
+    type Copied = Self::Mapped<<T as Copied>::Output>
     where
-        T: Sized,
-        (): StaticMaybe<Copied<T>>;
+        T: Copied,
+        (): StaticMaybe<<T as Copied>::Output>;
 
     fn is_some(&self) -> bool
     {
@@ -2190,18 +2186,17 @@ impl<T> /*const*/ Maybe<T> for Option<T>
     }
     fn copied(&self) -> Self::Copied
     where
-        Copied<T>: Copy,
-        T: Sized,
-        (): StaticMaybe<Copied<T>>
+        T: Copied<Output: Copy>,
+        (): StaticMaybe<<T as Copied>::Output>
     {
         self.as_ref()
             .map(crate::copy_ref)
     }
     fn cloned(&self) -> Self::Copied
     where
-        Copied<T>: Clone,
+        T: Copied<Output: Clone>,
         T: Sized,
-        (): StaticMaybe<Copied<T>>
+        (): StaticMaybe<<T as Copied>::Output>
     {
         self.as_ref()
             .map(crate::clone_ref)
@@ -2290,10 +2285,10 @@ impl<T> /*const*/ Maybe<T> for [T; 0]
     where
         U: StaticMaybe<U>,
         (): StaticMaybe<U>;
-    type Copied = Self::Mapped<Copied<T>>
+    type Copied = Self::Mapped<<T as Copied>::Output>
     where
-        T: Sized,
-        (): StaticMaybe<Copied<T>>;
+        T: Copied,
+        (): StaticMaybe<<T as Copied>::Output>;
 
     fn is_some(&self) -> bool
     {
@@ -2493,17 +2488,15 @@ impl<T> /*const*/ Maybe<T> for [T; 0]
     }
     fn copied(&self) -> Self::Copied
     where
-        Copied<T>: Copy,
-        T: Sized,
-        (): StaticMaybe<Copied<T>>
+        T: Copied<Output: Copy>,
+        (): StaticMaybe<<T as Copied>::Output>
     {
         []
     }
     fn cloned(&self) -> Self::Copied
     where
-        Copied<T>: Clone,
-        T: Sized,
-        (): StaticMaybe<Copied<T>>
+        T: Copied<Output: Clone>,
+        (): StaticMaybe<<T as Copied>::Output>
     {
         []
     }
@@ -2594,10 +2587,10 @@ impl<T> /*const*/ Maybe<T> for [T; 1]
     where
         U: StaticMaybe<U>,
         (): StaticMaybe<U>;
-    type Copied = Self::Mapped<Copied<T>>
+    type Copied = Self::Mapped<<T as Copied>::Output>
     where
-        T: Sized,
-        (): StaticMaybe<Copied<T>>;
+        T: Copied,
+        (): StaticMaybe<<T as Copied>::Output>;
 
     fn is_some(&self) -> bool
     {
@@ -2841,17 +2834,15 @@ impl<T> /*const*/ Maybe<T> for [T; 1]
     }
     fn copied(&self) -> Self::Copied
     where
-        Copied<T>: Copy,
-        T: Sized,
-        (): StaticMaybe<Copied<T>>
+        T: Copied<Output: Copy>,
+        (): StaticMaybe<<T as Copied>::Output>
     {
         [crate::copy_ref(&self[0])]
     }
     fn cloned(&self) -> Self::Copied
     where
-        Copied<T>: Clone,
-        T: Sized,
-        (): StaticMaybe<Copied<T>>
+        T: Copied<Output: Clone>,
+        (): StaticMaybe<<T as Copied>::Output>
     {
         [crate::clone_ref(&self[0])]
     }

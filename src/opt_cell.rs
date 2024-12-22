@@ -1331,8 +1331,8 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// ```
     pub const fn copied(&self) -> <Self as Maybe<T>>::Copied
     where
-        Copied<T>: Copy,
-        (): StaticMaybe<Copied<T>>
+        T: Copied<Output: Copy>,
+        (): StaticMaybe<<T as Copied>::Output>
     {
         if !IS_SOME
         {
@@ -1361,8 +1361,8 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// ```
     pub fn cloned(&self) -> <Self as Maybe<T>>::Copied
     where
-        Copied<T>: Clone,
-        (): StaticMaybe<Copied<T>>
+        T: Copied<Output: Clone>,
+        (): StaticMaybe<<T as Copied>::Output>
     {
         if !IS_SOME
         {
@@ -1698,9 +1698,10 @@ impl<T, const IS_SOME: bool> Maybe<T> for OptCell<T, IS_SOME>
     where
         U: StaticMaybe<U>,
         (): StaticMaybe<U>;
-    type Copied = Self::Mapped<Copied<T>>
+    type Copied = Self::Mapped<<T as Copied>::Output>
     where
-        (): StaticMaybe<Copied<T>>;
+        T: Copied,
+        (): StaticMaybe<<T as Copied>::Output>;
 
     fn is_some(&self) -> bool
     {
@@ -1900,17 +1901,15 @@ impl<T, const IS_SOME: bool> Maybe<T> for OptCell<T, IS_SOME>
     }
     fn copied(&self) -> Self::Copied
     where
-        crate::Copied<T>: Copy,
-        T: Sized,
-        (): StaticMaybe<crate::Copied<T>>
+        T: Copied<Output: Copy>,
+        (): StaticMaybe<<T as Copied>::Output>
     {
         self.copied()
     }
     fn cloned(&self) -> Self::Copied
     where
-        crate::Copied<T>: Clone,
-        T: Sized,
-        (): StaticMaybe<crate::Copied<T>>
+        T: Copied<Output: Clone>,
+        (): StaticMaybe<<T as Copied>::Output>
     {
         self.cloned()
     }
