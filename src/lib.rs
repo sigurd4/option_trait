@@ -33,7 +33,7 @@
 //!     - Compile-time managed
 //!     - Can be managed using constant expressions, but with some difficulty
 //!     - Also implements [`StaticMaybe`](StaticMaybe)
-//! - [`OptCell<T, _>`](OptCell) (`feature = "opt_cell"`)
+//! - [`OptCell<T, _>`](OptCell) (only if feature "opt_cell" is enabled)
 //!     - Compile-time managed
 //!     - Can be more easily managed using boolean constant expressions
 //!     - Has const methods
