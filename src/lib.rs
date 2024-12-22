@@ -234,7 +234,7 @@ mod test
         assert!(maybe.is_some());
         assert_eq!(**maybe.unwrap_ref(), 777);
 
-        let option = maybe.as_option_pin_mut();
+        let option = maybe.option_pin_mut();
 
         assert!(option.is_some());
         assert_eq!(*option.unwrap(), 777);

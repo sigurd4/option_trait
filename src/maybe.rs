@@ -973,12 +973,63 @@ where
     where
         F: FnOnce() -> E,
         T: Sized;
+    /// Dereferences the internal value, if it exists, and returns it in a new maybe.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = [Box::new(777)];
+    /// 
+    /// let dereferenced = Maybe::<Box<i32>>::as_deref(&maybe);
+    /// 
+    /// assert_eq!(dereferenced, [&777]);
+    /// ```
     fn as_deref<'a>(&'a self) -> Self::AsDeref<'a>
     where
         T: Deref + 'a;
+    /// Mutable dereferences the internal value, if it exists, and returns it in a new maybe.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let mut maybe = [Box::new(777)];
+    /// 
+    /// let dereferenced = Maybe::<Box<i32>>::as_deref_mut(&mut maybe);
+    /// 
+    /// assert_eq!(dereferenced, [&mut 777]);
+    /// ```
     fn as_deref_mut<'a>(&'a mut self) -> Self::AsDerefMut<'a>
     where
         T: DerefMut + 'a;
+    /// Returns the last of the two maybes, if both have a value, otherwise returns an empty maybe.
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let a = ();
+    /// let b = ();
+    /// 
+    /// assert_eq!(Maybe::<&str>::and(a, b), ());
+    /// 
+    /// let a = "First";
+    /// let b = ();
+    /// 
+    /// assert_eq!(Maybe::<&str>::and(a, b), ());
+    /// 
+    /// let a = ();
+    /// let b = "Second";
+    /// 
+    /// assert_eq!(Maybe::<&str>::and(a, b), ());
+    /// 
+    /// let a = "First";
+    /// let b = "Second";
+    /// 
+    /// assert_eq!(Maybe::<&str>::and(a, b), "Second");
+    /// ```
     fn and<Rhs>(self, other: Rhs) -> <Self::Pure as MaybeAnd<T, Rhs::Pure>>::Output
     where
         Rhs: Maybe<T>,
@@ -991,6 +1042,21 @@ where
     {
         MaybeAnd::and(self.pure(), other.pure())
     }
+    /// Maps the value into a different maybe if it exists using a flatmap function.
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe1 = "abcdefg";
+    /// let maybe2 = "abcdef";
+    /// 
+    /// let result1 = Maybe::<&str>::and_then::<&str, _>(maybe1, |value| if value.len() > 6 {None} else {Some(value)});
+    /// let result2 = Maybe::<&str>::and_then::<&str, _>(maybe2, |value| if value.len() > 6 {None} else {Some(value)});
+    /// 
+    /// assert_eq!(result1, None);
+    /// assert_eq!(result2, Some("abcdef"));
+    /// ```
+    #[doc(alias = "flatmap")]
     fn and_then<U, F>(self, and_then: F) -> <Self::Pure as MaybeAndThen<T, U, <<F as FnOnce<(T,)>>::Output as Maybe<U>>::Pure>>::Output
     where
         F: FnOnce<(T,), Output: Maybe<U>>,
@@ -1004,6 +1070,22 @@ where
     {
         MaybeAndThen::and_then(self.pure(), |x| and_then(x).pure())
     }
+    /// Filters the internal value depending on a predicate.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe1 = "abcdefg";
+    /// let maybe2 = "abcdef";
+    /// 
+    /// let result1 = Maybe::<&str>::filter(maybe1, |value| value.len() <= 6);
+    /// let result2 = Maybe::<&str>::filter(maybe2, |value| value.len() <= 6);
+    /// 
+    /// assert_eq!(result1, None);
+    /// assert_eq!(result2, Some("abcdef"));
+    /// ```
     fn filter<F>(self, predicate: F) -> <Self::Pure as MaybeFilter<T>>::Output
     where
         Self: Sized,
@@ -1014,6 +1096,31 @@ where
     {
         MaybeFilter::filter(self.pure(), predicate)
     }
+    /// Returns the first of the two maybes, if any of them have a value, otherwise returns an empty maybe.
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let a = ();
+    /// let b = ();
+    /// 
+    /// assert_eq!(Maybe::<&str>::or(a, b), ());
+    /// 
+    /// let a = "First";
+    /// let b = ();
+    /// 
+    /// assert_eq!(Maybe::<&str>::or(a, b), "First");
+    /// 
+    /// let a = ();
+    /// let b = "Second";
+    /// 
+    /// assert_eq!(Maybe::<&str>::or(a, b), "Second");
+    /// 
+    /// let a = "First";
+    /// let b = "Second";
+    /// 
+    /// assert_eq!(Maybe::<&str>::or(a, b), "First");
+    /// ```
     fn or<Rhs>(self, other: Rhs) -> <Self::Pure as MaybeOr<T, Rhs::Pure>>::Output
     where
         Rhs: Maybe<T>,
@@ -1026,6 +1133,31 @@ where
     {
         MaybeOr::or(self.pure(), other.pure())
     }
+    /// Returns the first of the two maybes, if any of them have a value, otherwise returns an empty maybe.
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let a = ();
+    /// let b = ();
+    /// 
+    /// assert_eq!(Maybe::<&str>::or_else(a, || b), ());
+    /// 
+    /// let a = "First";
+    /// let b = ();
+    /// 
+    /// assert_eq!(Maybe::<&str>::or_else(a, || b), "First");
+    /// 
+    /// let a = ();
+    /// let b = "Second";
+    /// 
+    /// assert_eq!(Maybe::<&str>::or_else(a, || b), "Second");
+    /// 
+    /// let a = "First";
+    /// let b = "Second";
+    /// 
+    /// assert_eq!(Maybe::<&str>::or_else(a, || b), "First");
+    /// ```
     fn or_else<F>(self, or_else: F) -> <Self::Pure as MaybeOr<T, <<F as FnOnce<()>>::Output as Maybe<T>>::Pure>>::Output
     where
         F: FnOnce<(), Output: Maybe<T, Pure: Sized>>,
@@ -1037,6 +1169,31 @@ where
     {
         MaybeOr::or_else(self.pure(), || or_else().pure())
     }
+    /// Returns the first of the two maybes, if exactly one of them have a value, otherwise returns an empty maybe.
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let a = ();
+    /// let b = ();
+    /// 
+    /// assert_eq!(Maybe::<&str>::xor(a, b), ());
+    /// 
+    /// let a = "First";
+    /// let b = ();
+    /// 
+    /// assert_eq!(Maybe::<&str>::xor(a, b), "First");
+    /// 
+    /// let a = ();
+    /// let b = "Second";
+    /// 
+    /// assert_eq!(Maybe::<&str>::xor(a, b), "Second");
+    /// 
+    /// let a = "First";
+    /// let b = "Second";
+    /// 
+    /// assert_eq!(Maybe::<&str>::xor(a, b), ());
+    /// ```
     fn xor<Rhs>(self, other: Rhs) -> <Self::Pure as MaybeXor<T, Rhs::Pure>>::Output
     where
         Rhs: Maybe<T>,
@@ -1049,39 +1206,225 @@ where
     {
         MaybeXor::xor(self.pure(), other.pure())
     }
+    /// Copies the internal value, if it exists, and returns it in a new maybe.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = [&777];
+    /// 
+    /// let copied = Maybe::<&i32>::copied(&maybe);
+    /// 
+    /// assert_eq!(copied, [777]);
+    /// ```
     fn copied(&self) -> Self::Copied
     where
         Copied<T>: Copy,
         T: Sized,
         (): StaticMaybe<Copied<T>>;
+    /// Clones the internal value, if it exists, and returns it in a new maybe.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = [&Box::new(777)];
+    /// 
+    /// let cloned = Maybe::<&Box<i32>>::cloned(&maybe);
+    /// 
+    /// assert_eq!(cloned, [Box::new(777)]);
+    /// ```
     fn cloned(&self) -> Self::Copied
     where
         Copied<T>: Clone,
         T: Sized,
         (): StaticMaybe<Copied<T>>;
 
+    /// Converts this maybe into an [Option](core::option::Option).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = 777;
+    /// let empty = ();
+    /// 
+    /// let some = Maybe::<i32>::option(maybe);
+    /// let none = Maybe::<i32>::option(empty);
+    /// 
+    /// assert_eq!(some, Some(777));
+    /// assert_eq!(none, None);
+    /// ```
     fn option(self) -> Option<T>
     where
         T: Sized;
-    fn as_option(&self) -> Option<&T>;
-    fn as_option_mut(&mut self) -> Option<&mut T>;
-    fn as_option_pin(self: Pin<&Self>) -> Option<Pin<&T>>;
-    fn as_option_pin_mut(self: Pin<&mut Self>) -> Option<Pin<&mut T>>;
+    /// Retrieves the internal value in the form of an [Option](core::option::Option).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = 777;
+    /// let empty = ();
+    /// 
+    /// let some = Maybe::<i32>::option_ref(&maybe);
+    /// let none = Maybe::<i32>::option_ref(&empty);
+    /// 
+    /// assert_eq!(some, Some(&777));
+    /// assert_eq!(none, None);
+    /// ```
+    fn option_ref(&self) -> Option<&T>;
+    /// Mutably retrieves the internal value in the form of an [Option](core::option::Option).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let mut maybe = 777;
+    /// let mut empty = ();
+    /// 
+    /// let some = Maybe::<i32>::option_mut(&mut maybe);
+    /// let none = Maybe::<i32>::option_mut(&mut empty);
+    /// 
+    /// assert_eq!(some, Some(&mut 777));
+    /// assert_eq!(none, None);
+    /// ```
+    fn option_mut(&mut self) -> Option<&mut T>;
+    /// Retrieves the pinned internal value in the form of an [Option](core::option::Option).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = core::pin::pin!(777);
+    /// let empty = core::pin::pin!(());
+    /// 
+    /// let some = Maybe::<i32>::option_pin_ref(maybe.as_ref());
+    /// let none = Maybe::<i32>::option_pin_ref(empty.as_ref());
+    /// 
+    /// assert_eq!(some, Some(maybe.as_ref()));
+    /// assert_eq!(none, None);
+    /// ```
+    fn option_pin_ref(self: Pin<&Self>) -> Option<Pin<&T>>;
+    /// Mutably retrieves the pinned internal value in the form of an [Option](core::option::Option).
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let mut maybe = core::pin::pin!(777);
+    /// let mut empty = core::pin::pin!(());
+    /// 
+    /// let some = Maybe::<i32>::option_pin_mut(maybe.as_mut());
+    /// let none = Maybe::<i32>::option_pin_mut(empty.as_mut());
+    /// 
+    /// assert_eq!(some, Some(core::pin::pin!(777)));
+    /// assert_eq!(none, None);
+    /// ```
+    fn option_pin_mut(self: Pin<&mut Self>) -> Option<Pin<&mut T>>;
 
+    /// Converts the maybe into a pure maybe.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = [777];
+    /// let empty = [];
+    /// 
+    /// let pure_maybe = Maybe::<i32>::pure(maybe);
+    /// let pure_empty = Maybe::<i32>::pure(empty);
+    /// 
+    /// assert_eq!(pure_maybe, 777);
+    /// assert_eq!(pure_empty, ());
+    /// ```
     fn pure(self) -> Self::Pure
     where
         T: StaticMaybe<T> + Sized,
         (): StaticMaybe<T>,
         Self::Pure: Sized;
+    /// Retrieves the internal value in a pure maybe.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = [777];
+    /// let empty = [];
+    /// 
+    /// let pure_maybe = Maybe::<i32>::pure_ref(&maybe);
+    /// let pure_empty = Maybe::<i32>::pure_ref(&empty);
+    /// 
+    /// assert_eq!(pure_maybe, &777);
+    /// assert_eq!(pure_empty, ());
+    /// ```
     fn pure_ref<'a>(&'a self) -> Self::PureRef<'a>
     where
         T: 'a;
+    /// Retrieves the internal value in a pure maybe.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let mut maybe = [777];
+    /// let mut empty = [];
+    /// 
+    /// let pure_maybe = Maybe::<i32>::pure_mut(&mut maybe);
+    /// let pure_empty = Maybe::<i32>::pure_mut(&mut empty);
+    /// 
+    /// assert_eq!(pure_maybe, &mut 777);
+    /// assert_eq!(pure_empty, ());
+    /// ```
     fn pure_mut<'a>(&'a mut self) -> Self::PureMut<'a>
     where
         T: 'a;
+    /// Retrieves the pinned internal value in a pure maybe.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let maybe = core::pin::pin!([777]);
+    /// let empty = core::pin::pin!([]);
+    /// 
+    /// let pure_maybe = Maybe::<i32>::pure_pin_ref(maybe.as_ref());
+    /// let pure_empty = Maybe::<i32>::pure_pin_ref(empty.as_ref());
+    /// 
+    /// assert_eq!(pure_maybe, core::pin::pin!(777));
+    /// assert_eq!(pure_empty, ());
+    /// ```
     fn pure_pin_ref<'a>(self: Pin<&'a Self>) -> Self::PurePinRef<'a>
     where
         T: 'a;
+    /// Mutably retrieves the pinned internal value in a pure maybe.
+    /// 
+    /// # Examples
+    /// 
+    /// ```rust
+    /// use option_trait::*;
+    /// 
+    /// let mut maybe = core::pin::pin!([777]);
+    /// let mut empty = core::pin::pin!([]);
+    /// 
+    /// let pure_maybe = Maybe::<i32>::pure_pin_mut(maybe.as_mut());
+    /// let pure_empty = Maybe::<i32>::pure_pin_mut(empty.as_mut());
+    /// 
+    /// assert_eq!(pure_maybe, core::pin::pin!(777));
+    /// assert_eq!(pure_empty, ());
+    /// ```
     fn pure_pin_mut<'a>(self: Pin<&'a mut Self>) -> Self::PurePinMut<'a>
     where
         T: 'a;
@@ -1343,19 +1686,19 @@ where
     {
         Some(self)
     }
-    fn as_option(&self) -> Option<&T>
+    fn option_ref(&self) -> Option<&T>
     {
         Some(self)
     }
-    fn as_option_mut(&mut self) -> Option<&mut T>
+    fn option_mut(&mut self) -> Option<&mut T>
     {
         Some(self)
     }
-    fn as_option_pin(self: Pin<&Self>) -> Option<Pin<&T>>
+    fn option_pin_ref(self: Pin<&Self>) -> Option<Pin<&T>>
     {
         Some(self)
     }
-    fn as_option_pin_mut(self: Pin<&mut Self>) -> Option<Pin<&mut T>>
+    fn option_pin_mut(self: Pin<&mut Self>) -> Option<Pin<&mut T>>
     {
         Some(self)
     }
@@ -1643,19 +1986,19 @@ where
     {
         None
     }
-    fn as_option(&self) -> Option<&T>
+    fn option_ref(&self) -> Option<&T>
     {
         None
     }
-    fn as_option_mut(&mut self) -> Option<&mut T>
+    fn option_mut(&mut self) -> Option<&mut T>
     {
         None
     }
-    fn as_option_pin(self: Pin<&Self>) -> Option<Pin<&T>>
+    fn option_pin_ref(self: Pin<&Self>) -> Option<Pin<&T>>
     {
         None
     }
-    fn as_option_pin_mut(self: Pin<&mut Self>) -> Option<Pin<&mut T>>
+    fn option_pin_mut(self: Pin<&mut Self>) -> Option<Pin<&mut T>>
     {
         None
     }
@@ -1940,19 +2283,19 @@ impl<T> /*const*/ Maybe<T> for Option<T>
     {
         self
     }
-    fn as_option(&self) -> Option<&T>
+    fn option_ref(&self) -> Option<&T>
     {
         self.as_ref()
     }
-    fn as_option_mut(&mut self) -> Option<&mut T>
+    fn option_mut(&mut self) -> Option<&mut T>
     {
         self.as_mut()
     }
-    fn as_option_pin(self: Pin<&Self>) -> Option<Pin<&T>>
+    fn option_pin_ref(self: Pin<&Self>) -> Option<Pin<&T>>
     {
         self.as_pin_ref()
     }
-    fn as_option_pin_mut(self: Pin<&mut Self>) -> Option<Pin<&mut T>>
+    fn option_pin_mut(self: Pin<&mut Self>) -> Option<Pin<&mut T>>
     {
         self.as_pin_mut()
     }
@@ -2240,19 +2583,19 @@ impl<T> /*const*/ Maybe<T> for [T; 0]
     {
         None
     }
-    fn as_option(&self) -> Option<&T>
+    fn option_ref(&self) -> Option<&T>
     {
         None
     }
-    fn as_option_mut(&mut self) -> Option<&mut T>
+    fn option_mut(&mut self) -> Option<&mut T>
     {
         None
     }
-    fn as_option_pin(self: Pin<&Self>) -> Option<Pin<&T>>
+    fn option_pin_ref(self: Pin<&Self>) -> Option<Pin<&T>>
     {
         None
     }
-    fn as_option_pin_mut(self: Pin<&mut Self>) -> Option<Pin<&mut T>>
+    fn option_pin_mut(self: Pin<&mut Self>) -> Option<Pin<&mut T>>
     {
         None
     }
@@ -2542,21 +2885,21 @@ impl<T> /*const*/ Maybe<T> for [T; 1]
         core::mem::forget(self);
         Some(value)
     }
-    fn as_option(&self) -> Option<&T>
+    fn option_ref(&self) -> Option<&T>
     {
         Some(&self[0])
     }
-    fn as_option_mut(&mut self) -> Option<&mut T>
+    fn option_mut(&mut self) -> Option<&mut T>
     {
         Some(&mut self[0])
     }
-    fn as_option_pin(self: Pin<&Self>) -> Option<Pin<&T>>
+    fn option_pin_ref(self: Pin<&Self>) -> Option<Pin<&T>>
     {
         Some(unsafe {
             self.map_unchecked(|this| &this[0])
         })
     }
-    fn as_option_pin_mut(self: Pin<&mut Self>) -> Option<Pin<&mut T>>
+    fn option_pin_mut(self: Pin<&mut Self>) -> Option<Pin<&mut T>>
     {
         Some(unsafe {
             self.map_unchecked_mut(|this| &mut this[0])
