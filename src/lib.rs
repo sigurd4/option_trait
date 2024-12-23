@@ -68,7 +68,8 @@
 
 moddef::moddef!(
     pub mod {
-        ops
+        ops,
+        opt_cell for cfg(feature = "opt_cell"),
     },
     flat(pub) mod {
         optional,
@@ -76,10 +77,12 @@ moddef::moddef!(
         pure_maybe,
         static_maybe,
         pure_static_maybe,
-        opt_cell for cfg(feature = "opt_cell"),
         not_void
-    }
+    },
 );
+
+#[cfg(feature = "opt_cell")]
+pub use opt_cell::OptCell;
 
 #[allow(unused)]
 const unsafe fn transmute_same_size<T, U>(value: T) -> U
@@ -203,10 +206,10 @@ mod private
     {
         type Output;
     }
-    /*impl<T> _Copied for T
+    impl<T> _Copied for T
     {
         default type Output = T;
-    }*/
+    }
     impl<T> _Copied for &T
     {
         type Output = T;

@@ -1,6 +1,6 @@
 use core::{hash::Hash, cmp::Ordering, fmt::Debug, marker::StructuralPartialEq, ops::{Deref, DerefMut}, pin::Pin};
 
-use crate::{ops::{MaybeAnd, MaybeAndThen, MaybeFilter, MaybeOr, MaybeXor}, Copied, Maybe, PureStaticMaybe, StaticMaybe};
+use crate::{ops::{MaybeAnd, MaybeAndThen, MaybeFilter, MaybeOr, MaybeXor}, Copied, Maybe, NotVoid, PureStaticMaybe, StaticMaybe};
 
 /// A struct containing a value of type `T`, if the constant expression `IS_SOME` evaluates to `true`.
 /// 
@@ -23,6 +23,8 @@ use crate::{ops::{MaybeAnd, MaybeAndThen, MaybeFilter, MaybeOr, MaybeXor}, Copie
 /// assert_eq!(full.unwrap(), ":^)");
 /// ```
 pub struct OptCell<T, const IS_SOME: bool>(<T as private::_Spec<IS_SOME>>::Pure);
+
+impl<T, const IS_SOME: bool> NotVoid for OptCell<T, IS_SOME> {}
 
 impl<T> OptCell<T, false>
 {
