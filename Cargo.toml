@@ -25,5 +25,5 @@ static_assertions = "1.1.0"
 
 [package.metadata.docs.rs]
 
-#all-features = true
+#all-features = true # feature "opt_cell" does not work on docs.rs :(
 no-default-features = true
