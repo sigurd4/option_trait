@@ -20,19 +20,19 @@
 //! [`Maybe<T>`](Maybe) is implemented for:
 //! - [`Option<T>`](core::option::Option)
 //!     - Run-time managed
-//!     - Also implements [`Optional`] and [`PureMaybe`](PureMaybe)
+//!     - Also implements [`Optional`] and [`PureMaybe`]
 //! - `T` and `()`
 //!     - Compile-time managed
-//!     - Also implements [`PureStaticMaybe`](PureStaticMaybe), [`PureMaybe`](PureMaybe) and [`StaticMaybe`](StaticMaybe)
+//!     - Also implements [`PureStaticMaybe`], [`PureMaybe`] and [`StaticMaybe`]
 //! - `[T; 1]` and `[T; 0]`
 //!     - Compile-time managed
 //!     - Can be managed using constant expressions, but with some difficulty
-//!     - Also implements [`StaticMaybe`](StaticMaybe)
-//! - [`OptCell<T, _>`](OptCell) (only if feature `opt_cell` is enabled)
+//!     - Also implements [`StaticMaybe`]
+//! - [`OptCell<T, _>`](crate::OptCell) (only if feature `opt_cell` is enabled)
 //!     - Compile-time managed
 //!     - Can be more easily managed using boolean constant expressions
 //!     - Has const methods
-//!     - Also implements [`StaticMaybe`](StaticMaybe)
+//!     - Also implements [`StaticMaybe`]
 //!
 //! # Examples
 //!
