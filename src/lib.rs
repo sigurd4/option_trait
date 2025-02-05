@@ -11,6 +11,7 @@
 #![feature(structural_match)]
 #![feature(core_intrinsics)]
 #![feature(const_eval_select)]
+#![feature(const_deref)]
 #![feature(specialization)]
 #![feature(generic_const_exprs)]
 
