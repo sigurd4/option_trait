@@ -1,4 +1,4 @@
-use core::{cell::UnsafeCell, marker::PhantomData, mem::ManuallyDrop, ops::{Bound, Range, RangeFrom, RangeInclusive, RangeTo, RangeToInclusive, Yeet}, pin::Pin};
+use core::{cell::UnsafeCell, marker::PhantomData, mem::ManuallyDrop, ops::{Bound, Range, RangeFrom, RangeInclusive, RangeTo, RangeToInclusive, Yeet}, pin::Pin, ptr::NonNull};
 
 /// A stupid trait made to avoid conflicting implementations.
 /// 
@@ -26,6 +26,7 @@ impl<T> NotVoid for Yeet<T> {}
 impl<T> NotVoid for Pin<T> {}
 impl<T> NotVoid for Bound<T> {}
 impl<T> NotVoid for Option<T> {}
+impl<T> NotVoid for NonNull<T> {}
 impl<T, E> NotVoid for Result<T, E> {}
 
 impl<T> NotVoid for &T where T: ?Sized {}

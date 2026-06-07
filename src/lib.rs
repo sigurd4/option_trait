@@ -7,11 +7,10 @@
 #![feature(try_trait_v2_yeet)]
 #![feature(unboxed_closures)]
 #![feature(associated_type_defaults)]
-#![feature(associated_const_equality)]
 #![feature(structural_match)]
 #![feature(core_intrinsics)]
 #![feature(const_eval_select)]
-#![feature(const_deref)]
+#![feature(const_convert)]
 #![feature(specialization)]
 #![feature(generic_const_exprs)]
 
@@ -84,6 +83,7 @@ moddef::moddef!(
 
 #[cfg(feature = "opt_cell")]
 pub use opt_cell::OptCell;
+use typebool::Bool;
 
 #[allow(unused)]
 const unsafe fn transmute_same_size<T, U>(value: T) -> U
@@ -109,8 +109,8 @@ where
     T: ?Sized,
     U: ?Sized
 {
-    assert!(<T as private::MaybeSame::<U>>::IS_SAME == <U as private::MaybeSame::<T>>::IS_SAME);
-    <T as private::MaybeSame<U>>::IS_SAME
+    assert!(<<T as private::MaybeSame::<U>>::IsSame as Bool>::VALUE == <<U as private::MaybeSame::<T>>::IsSame as Bool>::VALUE);
+    <<T as private::MaybeSame::<U>>::IsSame as Bool>::VALUE
 }
 
 #[allow(unused)]
@@ -180,28 +180,32 @@ where
 
 mod private
 {
+    use typebool::{Bool, False, True};
+
+    use crate::NotVoid;
+
     pub trait MaybeSame<T>
     where
         T: ?Sized
     {
-        const IS_SAME: bool;
+        type IsSame: Bool;
     }
     impl<T, U> MaybeSame<U> for T
     where
         T: ?Sized,
         U: ?Sized
     {
-        default const IS_SAME: bool = false;
+        default type IsSame = False;
     }
     impl<T> MaybeSame<T> for T
     where
         T: ?Sized
     {
-        const IS_SAME: bool = true;
+        type IsSame = True;
     }
 
     pub trait Same<T> {}
-    impl<T, U> Same<T> for U where T: MaybeSame<T, IS_SAME = true> {}
+    impl<T, U> Same<T> for U where T: MaybeSame<T, IsSame = True> {}
 
     pub trait _Copied: Sized
     {
@@ -219,8 +223,6 @@ mod private
     {
         type Output = T;
     }
-
-    use crate::NotVoid;
 
     pub trait Optional {}
     impl<T> Optional for Option<T> {}
