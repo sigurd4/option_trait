@@ -8,7 +8,7 @@ where
 {
     type Output: PureMaybe<U> + ?Sized;
 
-    fn and_then<F>(self, and_then: F) -> Self::Output
+    fn and_then<F>(maybe: Self, and_then: F) -> Self::Output
     where
         T: Sized,
         F: FnOnce(T) -> Rhs,
@@ -26,7 +26,7 @@ where
 {
     default type Output = U;
 
-    default fn and_then<F>(self, _: F) -> Self::Output
+    default fn and_then<F>(_maybe: Self, _: F) -> Self::Output
     where
         T: Sized,
         F: FnOnce(T) -> Rhs,
@@ -42,12 +42,12 @@ impl<T, U> MaybeAndThen<T, U, Option<U>> for Option<T>
 {
     type Output = Option<U>;
 
-    fn and_then<F>(self, and_then: F) -> Self::Output
+    fn and_then<F>(maybe: Self, and_then: F) -> Self::Output
     where
         T: Sized,
         F: FnOnce(T) -> Option<U>
     {
-        self.and_then(and_then)
+        maybe.and_then(and_then)
     }
 }
 impl<T, U> MaybeAndThen<T, U, ()> for Option<T>
@@ -56,11 +56,11 @@ where
 {
     type Output = ();
 
-    fn and_then<F>(self, and_then: F) -> Self::Output
+    fn and_then<F>(maybe: Self, and_then: F) -> Self::Output
     where
         F: FnOnce(T)
     {
-        if let Some(x) = self
+        if let Some(x) = maybe
         {
             and_then(x)
         }
@@ -70,11 +70,11 @@ impl<T, U> MaybeAndThen<T, U, U> for Option<T>
 {
     type Output = Option<U>;
     
-    fn and_then<F>(self, and_then: F) -> Self::Output
+    fn and_then<F>(maybe: Self, and_then: F) -> Self::Output
     where
         F: FnOnce(T) -> U
     {
-        self.map(and_then)
+        maybe.map(and_then)
     }
 }
 
@@ -86,7 +86,7 @@ where
 {
     type Output = ();
 
-    fn and_then<F>(self, _: F) -> Self::Output
+    fn and_then<F>(_maybe: Self, _: F) -> Self::Output
     {
         
     }
@@ -98,7 +98,7 @@ where
 {
     type Output = ();
 
-    fn and_then<F>(self, _: F) -> Self::Output
+    fn and_then<F>(_maybe: Self, _: F) -> Self::Output
     {
         
     }
@@ -108,11 +108,11 @@ impl<T, U> MaybeAndThen<T, U, Option<U>> for T
 {
     type Output = Option<U>;
 
-    fn and_then<F>(self, and_then: F) -> Self::Output
+    fn and_then<F>(maybe: Self, and_then: F) -> Self::Output
     where
         F: FnOnce(T) -> Option<U>
     {
-        and_then(self)
+        and_then(maybe)
     }
 }
 impl<T, U> MaybeAndThen<T, U, ()> for T
@@ -122,12 +122,12 @@ where
 {
     type Output = ();
 
-    fn and_then<F>(self, and_then: F) -> Self::Output
+    fn and_then<F>(maybe: Self, and_then: F) -> Self::Output
     where
         T: Sized,
         F: FnOnce(T)
     {
-        and_then(self)
+        and_then(maybe)
     }
 }
 impl<T, U> MaybeAndThen<T, U, U> for T
@@ -137,13 +137,13 @@ where
 {
     type Output = U;
 
-    fn and_then<F>(self, and_then: F) -> Self::Output
+    fn and_then<F>(maybe: Self, and_then: F) -> Self::Output
     where
         T: Sized,
         F: FnOnce(T) -> U,
         Self::Output: Sized,
         Self: Sized
     {
-        and_then(self)
+        and_then(maybe)
     }
 }

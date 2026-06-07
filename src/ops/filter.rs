@@ -4,7 +4,7 @@ pub trait MaybeFilter<T>: PureMaybe<T>
 {
     type Output: PureMaybe<T>;
 
-    fn filter<F>(self, predicate: F) -> Self::Output
+    fn filter<F>(maybe: Self, predicate: F) -> Self::Output
     where
         F: FnOnce(&T) -> bool;
 }
@@ -15,11 +15,11 @@ where
 {
     default type Output = Option<T>;
 
-    default fn filter<F>(self, predicate: F) -> Self::Output
+    default fn filter<F>(maybe: Self, predicate: F) -> Self::Output
     where
         F: FnOnce(&T) -> bool
     {
-        crate::assume_same(self.option().filter(predicate))
+        crate::assume_same(Maybe::option(maybe).filter(predicate))
     }
 }
 
@@ -27,11 +27,11 @@ impl<T> MaybeFilter<T> for Option<T>
 {
     type Output = Option<T>;
 
-    fn filter<F>(self, predicate: F) -> Self::Output
+    fn filter<F>(maybe: Self, predicate: F) -> Self::Output
     where
         F: FnOnce(&T) -> bool
     {
-        self.filter(predicate)
+        maybe.filter(predicate)
     }
 }
 
@@ -41,7 +41,7 @@ where
 {
     type Output = ();
 
-    fn filter<F>(self, _: F) -> Self::Output
+    fn filter<F>(_maybe: Self, _: F) -> Self::Output
     {
         
     }
@@ -51,10 +51,10 @@ impl<T> MaybeFilter<T> for T
 {
     type Output = Option<T>;
 
-    fn filter<F>(self, predicate: F) -> Self::Output
+    fn filter<F>(maybe: Self, predicate: F) -> Self::Output
     where
         F: FnOnce(&T) -> bool
     {
-        self.option().filter(predicate)
+        Maybe::option(maybe).filter(predicate)
     }
 }

@@ -45,7 +45,7 @@ where
     /// assert_eq!(<[&str; 1] as StaticMaybe<&str>>::maybe_from_fn(f), ["ok"]);
     /// assert_eq!(<[&str; 0] as StaticMaybe<&str>>::maybe_from_fn(f), [] as [&str; 0]);
     /// ```
-    fn maybe_from_fn<F>(func: F) -> Self
+    fn from_fn<F>(func: F) -> Self
     where
         F: FnOnce() -> T,
         T: Sized;
@@ -70,7 +70,7 @@ where
     /// assert_eq!(<[&str; 1] as StaticMaybe<&str>>::maybe_or_from_fn(maybe, or), "ok");
     /// assert_eq!(<[&str; 0] as StaticMaybe<&str>>::maybe_or_from_fn(maybe, or), false);
     /// ```
-    fn maybe_or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
+    fn or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
     where
         M: FnOnce<()>,
         O: FnOnce<()>,
@@ -89,14 +89,14 @@ where
     /// 
     /// assert_eq!(value, "turnip");
     /// ```
-    fn into_value(self) -> T
+    fn into_value(maybe: Self) -> T
     where
         Self: StaticMaybe<T, Maybe<T> = T>,
         (): PureStaticMaybe<T>,
         T: Sized,
         Self: Sized
     {
-        self.unwrap()
+        Maybe::unwrap(maybe)
     }
     /// Unwraps the maybe into its inner value by reference. This one won't panic, as opposed to [`Maybe::unwrap_ref()`](crate::Maybe::unwrap_ref).
     /// 
@@ -111,12 +111,12 @@ where
     /// 
     /// assert_eq!(value, &"turnip");
     /// ```
-    fn as_value(&self) -> &T
+    fn as_value(maybe: &Self) -> &T
     where
         Self: StaticMaybe<T, Maybe<T> = T>,
         (): PureStaticMaybe<T>
     {
-        self.unwrap_ref()
+        Maybe::unwrap_ref(maybe)
     }
     /// Unwraps the maybe into its inner value by mutable reference. This one won't panic, as opposed to [`Maybe::unwrap_mut()`](crate::Maybe::unwrap_mut).
     /// 
@@ -131,12 +131,12 @@ where
     /// 
     /// assert_eq!(value, &"turnip");
     /// ```
-    fn as_value_mut(&mut self) -> &mut T
+    fn as_value_mut(maybe: &mut Self) -> &mut T
     where
         Self: StaticMaybe<T, Maybe<T> = T>,
         (): PureStaticMaybe<T>
     {
-        self.unwrap_mut()
+        Maybe::unwrap_mut(maybe)
     }
 }
 impl<Some> /*const*/ StaticMaybe<Some> for Some
@@ -161,7 +161,7 @@ where
         M: ?Sized,
         O: ?Sized;
     
-    fn maybe_from_fn<F>(func: F) -> Self
+    fn from_fn<F>(func: F) -> Self
     where
         F: FnOnce() -> Some,
         Some: Sized
@@ -169,7 +169,7 @@ where
         func()
     }
     
-    fn maybe_or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
+    fn or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
     where
         M: FnOnce<()>,
         O: FnOnce<()>
@@ -196,7 +196,7 @@ where
         M: ?Sized,
         O: ?Sized;
 
-    fn maybe_from_fn<F>(func: F) -> Self
+    fn from_fn<F>(func: F) -> Self
     where
         F: FnOnce() -> Some,
         Some: Sized
@@ -204,7 +204,7 @@ where
         core::mem::drop(func);
     }
 
-    fn maybe_or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
+    fn or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
     where
         M: FnOnce<()>,
         O: FnOnce<()>
@@ -235,7 +235,7 @@ where
         M: ?Sized,
         O: ?Sized;
 
-    fn maybe_from_fn<F>(func: F) -> Self
+    fn from_fn<F>(func: F) -> Self
     where
         F: FnOnce() -> Some,
         Some: Sized
@@ -244,7 +244,7 @@ where
         []
     }
 
-    fn maybe_or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
+    fn or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
     where
         M: FnOnce<()>,
         O: FnOnce<()>
@@ -275,7 +275,7 @@ where
         M: ?Sized,
         O: ?Sized;
 
-    fn maybe_from_fn<F>(func: F) -> Self
+    fn from_fn<F>(func: F) -> Self
     where
         F: FnOnce() -> Some,
         Some: Sized
@@ -283,7 +283,7 @@ where
         [func()]
     }
 
-    fn maybe_or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
+    fn or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
     where
         M: FnOnce<()>,
         O: FnOnce<()>

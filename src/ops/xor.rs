@@ -7,7 +7,7 @@ where
 {
     type Output: PureMaybe<T> + ?Sized;
 
-    fn xor(self, other: Rhs) -> Self::Output
+    fn xor(maybe: Self, other: Rhs) -> Self::Output
     where
         Self::Output: Sized,
         Self: Sized,
@@ -22,7 +22,7 @@ where
 {
     default type Output = T;
 
-    default fn xor(self, _: Rhs) -> Self::Output
+    default fn xor(_maybe: Self, _: Rhs) -> Self::Output
     where
         Self::Output: Sized,
         Self: Sized,
@@ -36,9 +36,9 @@ impl<T> MaybeXor<T, Option<T>> for Option<T>
 {
     type Output = Option<T>;
 
-    fn xor(self, other: Option<T>) -> Self::Output
+    fn xor(maybe: Self, other: Option<T>) -> Self::Output
     {
-        self.xor(other)
+        maybe.xor(other)
     }
 }
 impl<T> MaybeXor<T, ()> for Option<T>
@@ -47,18 +47,18 @@ where
 {
     type Output = Option<T>;
 
-    fn xor(self, (): ()) -> Self::Output
+    fn xor(maybe: Self, (): ()) -> Self::Output
     {
-        self
+        maybe
     }
 }
 impl<T> MaybeXor<T, T> for Option<T>
 {
     type Output = Option<T>;
 
-    fn xor(self, other: T) -> Self::Output
+    fn xor(maybe: Self, other: T) -> Self::Output
     {
-        self.xor(other.option())
+        maybe.xor(Maybe::option(other))
     }
 }
 
@@ -69,7 +69,7 @@ where
 {
     type Output = Rhs;
 
-    fn xor(self, other: Rhs) -> Self::Output
+    fn xor(_maybe: Self, other: Rhs) -> Self::Output
     where
         Self::Output: Sized,
         Self: Sized
@@ -82,9 +82,9 @@ impl<T> MaybeXor<T, Option<T>> for T
 {
     type Output = Option<T>;
 
-    fn xor(self, other: Option<T>) -> Self::Output
+    fn xor(maybe: Self, other: Option<T>) -> Self::Output
     {
-        self.option().xor(other)
+        Maybe::option(maybe).xor(other)
     }
 }
 impl<T> MaybeXor<T, ()> for T
@@ -93,11 +93,11 @@ where
 {
     type Output = T;
 
-    fn xor(self, (): ()) -> Self::Output
+    fn xor(maybe: Self, (): ()) -> Self::Output
     where
         Self: Sized
     {
-        self
+        maybe
     }
 }
 impl<T> MaybeXor<T, T> for T
@@ -107,7 +107,7 @@ where
 {
     type Output = ();
 
-    fn xor(self, _: T) -> Self::Output
+    fn xor(_maybe: Self, _: T) -> Self::Output
     where
         Self: Sized
     {

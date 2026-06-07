@@ -1387,7 +1387,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     ///     assert_eq!(value, 777);
     /// }
     /// ```
-    pub fn iter(&self) -> core::option::Iter<T>
+    pub fn iter<'a>(&'a self) -> core::option::Iter<'a, T>
     {
         unsafe {
             crate::transmute_same_size::<
@@ -1413,7 +1413,7 @@ impl<T, const IS_SOME: bool> OptCell<T, IS_SOME>
     /// 
     /// assert_eq!(maybe, OptCell::some(777));
     /// ```
-    pub fn iter_mut(&mut self) -> core::option::IterMut<T>
+    pub fn iter_mut<'a>(&'a mut self) -> core::option::IterMut<'a, T>
     {
         unsafe {
             crate::transmute_same_size::<
@@ -1705,247 +1705,247 @@ impl<T, const IS_SOME: bool> Maybe<T> for OptCell<T, IS_SOME>
         T: Copied,
         (): StaticMaybe<<T as Copied>::Output>;
 
-    fn is_some(&self) -> bool
+    fn is_some(maybe: &Self) -> bool
     {
-        self.is_some()
+        maybe.is_some()
     }
-    fn is_none(&self) -> bool
+    fn is_none(maybe: &Self) -> bool
     {
-        self.is_none()
+        maybe.is_none()
     }
-    fn as_ref<'a>(&'a self) -> Self::AsRef<'a>
+    fn as_ref<'a>(maybe: &'a Self) -> Self::AsRef<'a>
     where
         T: 'a
     {
-        self.as_ref()
+        maybe.as_ref()
     }
-    fn as_mut<'a>(&'a mut self) -> Self::AsMut<'a>
+    fn as_mut<'a>(maybe: &'a mut Self) -> Self::AsMut<'a>
     where
         T: 'a
     {
-        self.as_mut()
+        maybe.as_mut()
     }
-    fn as_pin_ref<'a>(self: Pin<&'a Self>) -> Self::AsPinRef<'a>
+    fn as_pin_ref<'a>(maybe: Pin<&'a Self>) -> Self::AsPinRef<'a>
     where
         T: 'a
     {
-        self.as_pin_ref()
+        maybe.as_pin_ref()
     }
-    fn as_pin_mut<'a>(self: Pin<&'a mut Self>) -> Self::AsPinMut<'a>
+    fn as_pin_mut<'a>(maybe: Pin<&'a  mut Self>) -> Self::AsPinMut<'a>
     where
         T: 'a
     {
-        self.as_pin_mut()
+        maybe.as_pin_mut()
     }
-    fn as_slice(&self) -> &[T]
+    fn as_slice(maybe: &Self) -> &[T]
     where
         T: Sized
     {
-        self.as_slice()
+        maybe.as_slice()
     }
-    fn as_mut_slice(&mut self) -> &mut [T]
+    fn as_mut_slice(maybe: &mut Self) -> &mut [T]
     where
         T: Sized
     {
-        self.as_mut_slice()
+        maybe.as_mut_slice()
     }
-    fn expect(self, msg: &str) -> T
+    fn expect(maybe: Self, msg: &str) -> T
     where
         T: Sized
     {
-        self.expect(msg)
+        maybe.expect(msg)
     }
-    fn unwrap(self) -> T
+    fn unwrap(maybe: Self) -> T
     where
         T: Sized
     {
-        self.unwrap()
+        maybe.unwrap()
     }
-    fn unwrap_ref(&self) -> &T
+    fn unwrap_ref(maybe: &Self) -> &T
     {
-        self.unwrap_ref()
+        maybe.unwrap_ref()
     }
-    fn unwrap_mut(&mut self) -> &mut T
+    fn unwrap_mut(maybe: &mut Self) -> &mut T
     {
-        self.unwrap_mut()
+        maybe.unwrap_mut()
     }
-    fn unwrap_pin_ref<'a>(self: Pin<&'a Self>) -> Pin<&'a T>
+    fn unwrap_pin_ref<'a>(maybe: Pin<&'a Self>) -> Pin<&'a T>
     where
         T: 'a
     {
-        self.unwrap_pin_ref()
+        maybe.unwrap_pin_ref()
     }
-    fn unwrap_pin_mut<'a>(self: Pin<&'a mut Self>) -> Pin<&'a mut T>
+    fn unwrap_pin_mut<'a>(maybe: Pin<&'a  mut Self>) -> Pin<&'a mut T>
     where
         T: 'a
     {
-        self.unwrap_pin_mut()
+        maybe.unwrap_pin_mut()
     }
-    fn unwrap_or(self, default: T) -> T
+    fn unwrap_or(maybe: Self, default: T) -> T
     where
         T: Sized
     {
-        self.unwrap_or(default)
+        maybe.unwrap_or(default)
     }
-    fn unwrap_ref_or<'a>(&'a self, default: &'a T) -> &'a T
+    fn unwrap_ref_or<'a>(maybe: &'a Self, default: &'a T) -> &'a T
     where
         T: 'a
     {
-        self.unwrap_ref_or(default)
+        maybe.unwrap_ref_or(default)
     }
-    fn unwrap_mut_or<'a>(&'a mut self, default: &'a mut T) -> &'a mut T
+    fn unwrap_mut_or<'a>(maybe: &'a mut Self, default: &'a mut T) -> &'a mut T
     where
         T: 'a
     {
-        self.unwrap_mut_or(default)
+        maybe.unwrap_mut_or(default)
     }
-    fn unwrap_pin_ref_or<'a>(self: Pin<&'a Self>, default: Pin<&'a T>) -> Pin<&'a T>
+    fn unwrap_pin_ref_or<'a>(maybe: Pin<&'a Self>, default: Pin<&'a T>) -> Pin<&'a T>
     where
         T: 'a
     {
-        self.unwrap_pin_ref_or(default)
+        maybe.unwrap_pin_ref_or(default)
     }
-    fn unwrap_pin_mut_or<'a>(self: Pin<&'a mut Self>, default: Pin<&'a mut T>) -> Pin<&'a mut T>
+    fn unwrap_pin_mut_or<'a>(maybe: Pin<&'a  mut Self>, default: Pin<&'a mut T>) -> Pin<&'a mut T>
     where
         T: 'a
     {
-        self.unwrap_pin_mut_or(default)
+        maybe.unwrap_pin_mut_or(default)
     }
-    fn unwrap_or_else<F>(self, default: F) -> T
+    fn unwrap_or_else<F>(maybe: Self, default: F) -> T
     where
         F: FnOnce() -> T,
         T: Sized
     {
-        self.unwrap_or_else(default)
+        maybe.unwrap_or_else(default)
     }
-    fn unwrap_ref_or_else<'a, F>(&'a self, default: F) -> &'a T
+    fn unwrap_ref_or_else<'a, F>(maybe: &'a Self, default: F) -> &'a T
     where
         F: FnOnce() -> &'a T,
         T: 'a
     {
-        self.unwrap_ref_or_else(default)
+        maybe.unwrap_ref_or_else(default)
     }
-    fn unwrap_mut_or_else<'a, F>(&'a mut self, default: F) -> &'a mut T
+    fn unwrap_mut_or_else<'a, F>(maybe: &'a mut Self, default: F) -> &'a mut T
     where
         F: FnOnce() -> &'a mut T,
         T: 'a
     {
-        self.unwrap_mut_or_else(default)
+        maybe.unwrap_mut_or_else(default)
     }
-    fn unwrap_pin_ref_or_else<'a, F>(self: Pin<&'a Self>, default: F) -> Pin<&'a T>
+    fn unwrap_pin_ref_or_else<'a, F>(maybe: Pin<&'a Self>, default: F) -> Pin<&'a T>
     where
         F: FnOnce() -> Pin<&'a T>,
         T: 'a
     {
-        self.unwrap_pin_ref_or_else(default)
+        maybe.unwrap_pin_ref_or_else(default)
     }
-    fn unwrap_pin_mut_or_else<'a, F>(self: Pin<&'a mut Self>, default: F) -> Pin<&'a mut T>
+    fn unwrap_pin_mut_or_else<'a, F>(maybe: Pin<&'a  mut Self>, default: F) -> Pin<&'a mut T>
     where
         F: FnOnce() -> Pin<&'a mut T>,
         T: 'a
     {
-        self.unwrap_pin_mut_or_else(default)
+        maybe.unwrap_pin_mut_or_else(default)
     }
-    fn unwrap_or_default(self) -> T
+    fn unwrap_or_default(maybe: Self) -> T
     where
         T: Sized + Default
     {
-        self.unwrap_or_default()
+        maybe.unwrap_or_default()
     }
-    fn map<U, F>(self, map: F) -> Self::Mapped<U>
+    fn map<U, F>(maybe: Self, map: F) -> Self::Mapped<U>
     where
         F: FnOnce(T) -> U,
         T: Sized,
         U: StaticMaybe<U>,
         (): StaticMaybe<U>
     {
-        self.map(map)
+        maybe.map(map)
     }
-    fn map_or<U, F>(self, default: U, map: F) -> U
+    fn map_or<U, F>(maybe: Self, default: U, map: F) -> U
     where
         F: FnOnce(T) -> U,
         T: Sized
     {
-        self.map_or(default, map)
+        maybe.map_or(default, map)
     }
-    fn map_or_else<U, D, F>(self, default: D, map: F) -> U
+    fn map_or_else<U, D, F>(maybe: Self, default: D, map: F) -> U
     where
         D: FnOnce() -> U,
         F: FnOnce(T) -> U,
         T: Sized
     {
-        self.map_or_else(default, map)
+        maybe.map_or_else(default, map)
     }
-    fn ok_or<E>(self, error: E) -> Result<T, E>
+    fn ok_or<E>(maybe: Self, error: E) -> Result<T, E>
     where
         T: Sized
     {
-        self.ok_or(error)
+        maybe.ok_or(error)
     }
-    fn ok_or_else<E, F>(self, error: F) -> Result<T, E>
+    fn ok_or_else<E, F>(maybe: Self, error: F) -> Result<T, E>
     where
         F: FnOnce() -> E,
         T: Sized
     {
-        self.ok_or_else(error)
+        maybe.ok_or_else(error)
     }
-    fn as_deref<'a>(&'a self) -> Self::AsDeref<'a>
+    fn as_deref<'a>(maybe: &'a Self) -> Self::AsDeref<'a>
     where
         T: Deref + 'a
     {
-        self.as_deref()
+        maybe.as_deref()
     }
-    fn as_deref_mut<'a>(&'a mut self) -> Self::AsDerefMut<'a>
+    fn as_deref_mut<'a>(maybe: &'a mut Self) -> Self::AsDerefMut<'a>
     where
         T: DerefMut + 'a
     {
-        self.as_deref_mut()
+        maybe.as_deref_mut()
     }
-    fn copied(&self) -> Self::Copied
+    fn copied(maybe: &Self) -> Self::Copied
     where
         T: Copied<Output: Copy>,
         (): StaticMaybe<<T as Copied>::Output>
     {
-        self.copied()
+        maybe.copied()
     }
-    fn cloned(&self) -> Self::Copied
+    fn cloned(maybe: &Self) -> Self::Copied
     where
         T: Copied<Output: Clone>,
         (): StaticMaybe<<T as Copied>::Output>
     {
-        self.cloned()
+        maybe.cloned()
     }
     
-    fn option(self) -> Option<T>
+    fn option(maybe: Self) -> Option<T>
     {
-        self.option()
+        maybe.option()
     }
-    fn option_ref(&self) -> Option<&T>
+    fn option_ref(maybe: &Self) -> Option<&T>
     {
-        self.get()
+        maybe.get()
     }
-    fn option_mut(&mut self) -> Option<&mut T>
+    fn option_mut(maybe: &mut Self) -> Option<&mut T>
     {
-        self.get_mut()
+        maybe.get_mut()
     }
-    fn option_pin_ref(self: Pin<&Self>) -> Option<Pin<&T>>
+    fn option_pin_ref(maybe: Pin<&Self>) -> Option<Pin<&T>>
     {
-        self.get_pin()
+        maybe.get_pin()
     }
-    fn option_pin_mut(self: Pin<&mut Self>) -> Option<Pin<&mut T>>
+    fn option_pin_mut(maybe: Pin<&mut Self>) -> Option<Pin<&mut T>>
     {
-        self.get_pin_mut()
+        maybe.get_pin_mut()
     }
 
-    fn pure(self) -> Self::Pure
+    fn pure(maybe: Self) -> Self::Pure
     where
         T: StaticMaybe<T> + Sized,
         (): StaticMaybe<T>,
         Self::Pure: Sized
     {
-        self.0
+        maybe.0
     }
-    fn pure_ref<'a>(&'a self) -> Self::PureRef<'a>
+    fn pure_ref<'a>(maybe: &'a Self) -> Self::PureRef<'a>
     where
         T: 'a
     {
@@ -1953,9 +1953,9 @@ impl<T, const IS_SOME: bool> Maybe<T> for OptCell<T, IS_SOME>
         {
             return crate::assume_same(())
         }
-        crate::assume_same(&self.0)
+        crate::assume_same(&maybe.0)
     }
-    fn pure_mut<'a>(&'a mut self) -> Self::PureMut<'a>
+    fn pure_mut<'a>(maybe: &'a mut Self) -> Self::PureMut<'a>
     where
         T: 'a
     {
@@ -1963,9 +1963,9 @@ impl<T, const IS_SOME: bool> Maybe<T> for OptCell<T, IS_SOME>
         {
             return crate::assume_same(())
         }
-        crate::assume_same(&mut self.0)
+        crate::assume_same(&mut maybe.0)
     }
-    fn pure_pin_ref<'a>(self: Pin<&'a Self>) -> Self::PurePinRef<'a>
+    fn pure_pin_ref<'a>(maybe: Pin<&'a Self>) -> Self::PurePinRef<'a>
     where
         T: 'a
     {
@@ -1974,10 +1974,10 @@ impl<T, const IS_SOME: bool> Maybe<T> for OptCell<T, IS_SOME>
             return crate::assume_same(())
         }
         crate::assume_same(unsafe {
-            self.map_unchecked(|this| &this.0)
+            maybe.map_unchecked(|this| &this.0)
         })
     }
-    fn pure_pin_mut<'a>(self: Pin<&'a mut Self>) -> Self::PurePinMut<'a>
+    fn pure_pin_mut<'a>(maybe: Pin<&'a  mut Self>) -> Self::PurePinMut<'a>
     where
         T: 'a
     {
@@ -1986,7 +1986,7 @@ impl<T, const IS_SOME: bool> Maybe<T> for OptCell<T, IS_SOME>
             return crate::assume_same(())
         }
         crate::assume_same(unsafe {
-            self.map_unchecked_mut(|this| &mut this.0)
+            maybe.map_unchecked_mut(|this| &mut this.0)
         })
     }
 }
@@ -2013,7 +2013,7 @@ where
         M: ?Sized,
         O: ?Sized;
 
-    fn maybe_from_fn<F>(func: F) -> Self
+    fn from_fn<F>(func: F) -> Self
     where
         F: FnOnce() -> T,
         T: Sized
@@ -2021,7 +2021,7 @@ where
         Self::from_fn(func)
     }
     
-    fn maybe_or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
+    fn or_from_fn<M, O>(maybe: M, or: O) -> Self::MaybeOr<M::Output, O::Output>
     where
         M: FnOnce<()>,
         O: FnOnce<()>,
@@ -2034,14 +2034,14 @@ where
         crate::assume_same(maybe())
     }
 
-    fn into_value(self) -> T
+    fn into_value(maybe: Self) -> T
     where
         Self: StaticMaybe<T, Maybe<T> = T>,
         T: Sized,
         (): PureStaticMaybe<T>,
         Self: Sized
     {
-        self.unwrap()
+        maybe.unwrap()
     }
 }
 

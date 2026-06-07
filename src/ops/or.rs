@@ -7,13 +7,13 @@ where
 {
     type Output: PureMaybe<T> + ?Sized;
 
-    fn or(self, other: Rhs) -> Self::Output
+    fn or(maybe: Self, other: Rhs) -> Self::Output
     where
         Self::Output: Sized,
         Self: Sized,
         Rhs: Sized;
 
-    fn or_else<F>(self, or_else: F) -> Self::Output
+    fn or_else<F>(maybe: Self, or_else: F) -> Self::Output
     where
         F: FnOnce() -> Rhs,
         Self::Output: Sized,
@@ -29,7 +29,7 @@ where
 {
     default type Output = T;
 
-    default fn or(self, _: Rhs) -> Self::Output
+    default fn or(_maybe: Self, _: Rhs) -> Self::Output
     where
         Self::Output: Sized,
         Self: Sized,
@@ -38,7 +38,7 @@ where
         unreachable!()
     }
 
-    default fn or_else<F>(self, _: F) -> Self::Output
+    default fn or_else<F>(_maybe: Self, _: F) -> Self::Output
     where
         Self::Output: Sized,
         Self: Sized,
@@ -52,16 +52,16 @@ impl<T> MaybeOr<T, Option<T>> for Option<T>
 {
     type Output = Option<T>;
 
-    fn or(self, other: Option<T>) -> Self::Output
+    fn or(maybe: Self, other: Option<T>) -> Self::Output
     {
-        self.or(other)
+        maybe.or(other)
     }
 
-    fn or_else<F>(self, or_else: F) -> Self::Output
+    fn or_else<F>(maybe: Self, or_else: F) -> Self::Output
     where
         F: FnOnce() -> Option<T>
     {
-        self.or_else(or_else)
+        maybe.or_else(or_else)
     }
 }
 impl<T> MaybeOr<T, ()> for Option<T>
@@ -70,36 +70,36 @@ where
 {
     type Output = Option<T>;
 
-    fn or(self, (): ()) -> Self::Output
+    fn or(maybe: Self, (): ()) -> Self::Output
     {
-        self
+        maybe
     }
 
-    fn or_else<F>(self, or_else: F) -> Self::Output
+    fn or_else<F>(maybe: Self, or_else: F) -> Self::Output
     where
         F: FnOnce()
     {
-        if self.is_none()
+        if maybe.is_none()
         {
             or_else()
         }
-        self
+        maybe
     }
 }
 impl<T> MaybeOr<T, T> for Option<T>
 {
     type Output = T;
 
-    fn or(self, rhs: T) -> Self::Output
+    fn or(maybe: Self, rhs: T) -> Self::Output
     {
-        self.unwrap_or(rhs)
+        maybe.unwrap_or(rhs)
     }
 
-    fn or_else<F>(self, or_else: F) -> Self::Output
+    fn or_else<F>(maybe: Self, or_else: F) -> Self::Output
     where
         F: FnOnce() -> T
     {
-        self.unwrap_or_else(or_else)
+        maybe.unwrap_or_else(or_else)
     }
 }
 
@@ -109,12 +109,12 @@ where
 {
     type Output = Option<T>;
 
-    fn or(self, other: Option<T>) -> Self::Output
+    fn or(_maybe: Self, other: Option<T>) -> Self::Output
     {
         other
     }
 
-    fn or_else<F>(self, or_else: F) -> Self::Output
+    fn or_else<F>(_maybe: Self, or_else: F) -> Self::Output
     where
         F: FnOnce() -> Option<T>
     {
@@ -127,12 +127,12 @@ where
 {
     type Output = ();
 
-    fn or(self, (): ()) -> Self::Output
+    fn or(_maybe: Self, (): ()) -> Self::Output
     {
         
     }
 
-    fn or_else<F>(self, or_else: F) -> Self::Output
+    fn or_else<F>(_maybe: Self, or_else: F) -> Self::Output
     where
         F: FnOnce()
     {
@@ -145,14 +145,14 @@ where
 {
     type Output = T;
 
-    fn or(self, rhs: T) -> Self::Output
+    fn or(_maybe: Self, rhs: T) -> Self::Output
     where
         Self::Output: Sized
     {
         rhs
     }
 
-    fn or_else<F>(self, or_else: F) -> Self::Output
+    fn or_else<F>(_maybe: Self, or_else: F) -> Self::Output
     where
         F: FnOnce() -> T,
         Self::Output: Sized
@@ -168,17 +168,17 @@ where
 {
     type Output = T;
 
-    fn or(self, _: Rhs) -> Self::Output
+    fn or(maybe: Self, _: Rhs) -> Self::Output
     where
         Self::Output: Sized
     {
-        self
+        maybe
     }
 
-    fn or_else<F>(self, _: F) -> Self::Output
+    fn or_else<F>(maybe: Self, _: F) -> Self::Output
     where
         Self::Output: Sized
     {
-        self
+        maybe
     }
 }

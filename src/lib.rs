@@ -285,10 +285,10 @@ mod test
 
         let maybe = core::pin::pin!(777);
 
-        assert!(maybe.is_some());
-        assert_eq!(**maybe.unwrap_ref(), 777);
+        assert!(Maybe::is_some(&maybe));
+        assert_eq!(**Maybe::unwrap_ref(&maybe), 777);
 
-        let option = maybe.option_pin_mut();
+        let option = Maybe::option_pin_mut(maybe);
 
         assert!(option.is_some());
         assert_eq!(*option.unwrap(), 777);
